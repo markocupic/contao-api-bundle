@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * This file is part of Contao Content Api.
- * 
+ *
  * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -20,9 +20,10 @@ use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class Plugin
+ * Class Plugin.
  */
 class Plugin implements BundlePluginInterface, RoutingPluginInterface
 {
@@ -38,13 +39,15 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     }
 
     /**
-     * @return null|\Symfony\Component\Routing\RouteCollection
      * @throws \Exception
+     *
+     * @return RouteCollection|null
      */
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
     {
         return $resolver
-            ->resolve(__DIR__ . '/../Resources/config/routes.yml')
-            ->load(__DIR__ . '/../Resources/config/routes.yml');
+            ->resolve(__DIR__.'/../Resources/config/routes.yml')
+            ->load(__DIR__.'/../Resources/config/routes.yml')
+        ;
     }
 }

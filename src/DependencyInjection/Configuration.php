@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * This file is part of Contao Content Api.
- * 
+ *
  * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_KEY = 'markocupic_contao_content_api';
+    public const ROOT_KEY = 'markocupic_contao_content_api';
 
     public function getConfigTreeBuilder()
     {
