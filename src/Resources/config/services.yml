@@ -3,8 +3,8 @@ services:
         autowire: true
         autoconfigure: true
         public: true
-        bind:
-            $projectDir: '%kernel.project_dir%'
+        #bind:
+            #$projectDir: '%kernel.project_dir%'
 
     Markocupic\ContaoContentApi\:
         resource: ../../

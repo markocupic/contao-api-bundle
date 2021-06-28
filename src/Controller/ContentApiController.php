@@ -2,6 +2,7 @@
 
 namespace Markocupic\ContaoContentApi\Controller;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,10 +24,15 @@ use Markocupic\ContaoContentApi\ApiUser;
 /**
  * ContentApiController provides all routes.
  *
- * @Route("/api", defaults={"_scope" = "frontend", "_token_check" = false})
+ * @Route("/mc_api", defaults={"_scope" = "frontend", "_token_check" = false})
  */
 class ContentApiController extends Controller
 {
+    /**
+     * @var ContaoFramework
+     */
+    private $framework;
+
     /**
      * @var ApiUser
      */
@@ -41,6 +47,10 @@ class ContentApiController extends Controller
      * @var string
      */
     private $header;
+
+    public function __construct(ContaoFramework $framework){
+
+    }
 
     /**
      * Called at the begin of every request.
@@ -110,7 +120,7 @@ class ContentApiController extends Controller
         }
 
         // Initialize Contao
-        $this->container->get('contao.framework')->initialize();
+        $this->framework->initialize();
         $this->apiUser = new ApiUser();
         if (!defined('BE_USER_LOGGED_IN')) {
             define('BE_USER_LOGGED_IN', false);
