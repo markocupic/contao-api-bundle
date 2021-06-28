@@ -1,4 +1,6 @@
 # Contao Content API
+# Forked from [DieSchittigs/contao-content-api](https://github.com/DieSchittigs/contao-content-api-bundle) and adapted
+# Please don't use in production
 
 We at [Die Schittigs](http://www.dieschittigs.de) love
 [Contao](https://contao.org/de/), but the web moves
@@ -28,61 +30,61 @@ Contao Content API is now installed and ready to use.
 
 Once installed, the following routes are available:
 
-##### /api/sitemap
+##### /_mc_cc_api/sitemap
 
 Gets the sitemap including the root pages.
 
 [Example](examples/sitemap.json)
 
-##### /api/sitemap/flat
+##### /_mc_cc_api/sitemap/flat
 
 Gets all pages as key value pairings where the key is the URL.
 
 [Example](examples/sitemap_flat.json)
 
-##### /api/urls[?file=sitemap]
+##### /_mc_cc_api/urls[?file=sitemap]
 
 Gets all URLs from the generated sitemap XML(s). If you define a `file`, only that XML will be parsed.
 
 [Example](examples/urls.json)
 
-##### /api/page?url=/about/team.html
+##### /_mc_cc_api/page?url=/about/team.html
 
 Gets the page, including all articles and contents at the `url`.
 
 [Example](examples/page.json)
 
-##### /api/newsreader?url=/news/detail/new-website.html
+##### /_mc_cc_api/newsreader?url=/news/detail/new-website.html
 
 Gets the news reader content from the `url`
 
 [Example](examples/newsreader.json)
 
-##### /api/?url=/page/or/newsarticle.html
+##### /_mc_cc_api/?url=/page/or/newsarticle.html
 
 Tries to get the page at the `url`, and contents from any reader
 
 [Example](examples/page_newsreader.json)
 
-##### /api/user
+##### /_mc_cc_api/user
 
 Gets the logged-in frontend user, if available.
 
 [Example](examples/user.json)
 
-##### /api/module?id=5
+##### /_mc_cc_api/module?id=5
 
 Gets the content of a module by id
 
 [Example](examples/module.json)
 
-##### /api/text?file=tl_news,modules
+##### /_mc_cc_api/text?file=tl_news,modules
 
 Gets the content of a language file by filename(s)
 
 [Example](examples/text.json)
 
-##### /api/file?path=files/uploads&depth=2
+##### /_mc_cc_api/file?path=files/uploads&depth=2
 
 Gets the file or directory at `path` and also it's children, limited by `depth`
 
@@ -135,7 +137,7 @@ so by adding them in your `parameters.yml`.
 Please note that the second parameter is the **model** class, **not the module**
 class. The new reader is now available at
 
-##### /api/blogreader?url=/blog/detail/on-the-topic.html
+##### /_mc_cc_api/blogreader?url=/blog/detail/on-the-topic.html
 
 or, if you want to include the whole page, at
 

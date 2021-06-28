@@ -9,3 +9,7 @@
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-content-api
  */
+
+namespace Markocupic\ContaoContentApi;
+
+$GLOBALS['TL_HOOKS']['apiModuleGenerated'][] = [Hooks::class, 'apiModuleGenerated'];

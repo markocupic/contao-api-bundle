@@ -24,7 +24,7 @@ use Markocupic\ContaoContentApi\ApiUser;
 /**
  * ContentApiController provides all routes.
  *
- * @Route("/mc_api", defaults={"_scope" = "frontend", "_token_check" = false})
+ * @Route("/_mc_cc_api", defaults={"_scope" = "frontend", "_token_check" = false})
  */
 class ContentApiController extends Controller
 {
@@ -49,7 +49,7 @@ class ContentApiController extends Controller
     private $header;
 
     public function __construct(ContaoFramework $framework){
-
+        $this->framework = $framework;
     }
 
     /**
