@@ -1,6 +1,6 @@
 # Contao Content API
-# Forked from [DieSchittigs/contao-content-api](https://github.com/DieSchittigs/contao-content-api-bundle) and then adapted
-# Please don't use in production
+## Forked from [DieSchittigs/contao-content-api](https://github.com/DieSchittigs/contao-content-api-bundle) and then adapted
+## Please don't use in production
 
 We at [Die Schittigs](http://www.dieschittigs.de) love
 [Contao](https://contao.org/de/), but the web moves
