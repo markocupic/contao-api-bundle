@@ -72,9 +72,15 @@ Gets the logged-in frontend user, if available.
 
 [Example](examples/user.json)
 
-##### /_mc_cc_api/module?id=5
+##### /_mc_cc_api/content_element/{id}
 
-Gets the content of a module by id
+Gets the content of a content element by id.
+
+[Example](examples/content_element.json)
+
+##### /_mc_cc_api/module/{id}
+
+Gets the content of a module by id.
 
 [Example](examples/module.json)
 

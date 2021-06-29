@@ -17,8 +17,9 @@ namespace Markocupic\ContaoContentApi\Controller;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
+use Markocupic\ContaoContentApi\Api\ApiContentElement;
+use Markocupic\ContaoContentApi\Api\ApiModule;
 use Markocupic\ContaoContentApi\Api\ApiUser;
-use Markocupic\ContaoContentApi\ApiModule;
 use Markocupic\ContaoContentApi\ContentApiResponse;
 use Markocupic\ContaoContentApi\Exceptions\ContentApiNotFoundException;
 use Markocupic\ContaoContentApi\File;
@@ -52,11 +53,6 @@ class ContentApiController extends Controller
     private $contaoFrontendUser;
 
     /**
-     * @var ApiUser
-     */
-    private $apiUser;
-
-    /**
      * @var null
      */
     private $lang;
@@ -64,13 +60,12 @@ class ContentApiController extends Controller
     /**
      * @var string
      */
-    private $header;
+    private $headers;
 
-    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser, ApiUser $apiUser)
+    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser)
     {
         $this->framework = $framework;
         $this->contaoFrontendUser = $contaoFrontendUser;
-        $this->apiUser = $apiUser;
     }
 
     /**
@@ -131,7 +126,7 @@ class ContentApiController extends Controller
     {
         $request = $this->init($request);
 
-        return new ContentApiResponse($this->apiUser, 200, $this->headers);
+        return new ContentApiResponse(new ApiUser($this->contaoFrontendUser), 200, $this->headers);
     }
 
     /**
@@ -178,13 +173,27 @@ class ContentApiController extends Controller
      *
      * @return Response
      *
-     * @Route("/module", name="markocupic_content_api_module")
+     * @Route("/content_element/{id}", name="markocupic_content_api_content_element", requirements={"id"="\d+"})
      */
-    public function moduleAction(Request $request)
+    public function contentElementAction(Request $request, int $id = 0)
     {
-        $request = $this->init($request);
+        $this->init($request);
 
-        return new ContentApiResponse(new ApiModule($request->query->get('id', 0)), 200, $this->headers);
+        return new ContentApiResponse(new ApiContentElement($id), 200, $this->headers);
+    }
+
+    /**
+     * @param Request $request Current request
+     *
+     * @return Response
+     *
+     * @Route("/module/{id}", name="markocupic_content_api_module", requirements={"id"="\d+"})
+     */
+    public function moduleAction(Request $request, int $id = 0)
+    {
+        $this->init($request);
+
+        return new ContentApiResponse(new ApiModule($id), 200, $this->headers);
     }
 
     /**
@@ -216,7 +225,7 @@ class ContentApiController extends Controller
         $readers = $this->getParameter('content_api_readers');
 
         if (!$readers[$reader]) {
-            return new ContentApiResponse('Reader "'.$reader.'" not available'.$url, 404);
+            return new ContentApiResponse('Reader "'.$reader.'" not available', 404);
         }
         $url = $request->query->get('url', '/');
         $page = Page::findByUrl($url, false);

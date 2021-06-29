@@ -5,9 +5,11 @@ namespace Markocupic\ContaoContentApi;
 use Contao\ArticleModel;
 use Contao\Controller;
 use Contao\ModuleArticle;
+use Markocupic\ContaoContentApi\Api\ApiContentElement;
 
 /**
- * ApiContentElement augments ArticleModel for the API.
+ * Class Article
+ * @package Markocupic\ContaoContentApi
  */
 class Article extends AugmentedContaoModel
 {

@@ -1,12 +1,25 @@
 <?php
 
-namespace Markocupic\ContaoContentApi;
+declare(strict_types=1);
 
-use Contao\ContentModel;
-use Contao\FormModel;
-use Contao\FormFieldModel;
+/*
+ * This file is part of Contao Content Api.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-content-api
+ */
+
+namespace Markocupic\ContaoContentApi\Api;
+
 use Contao\ContentElement;
+use Contao\ContentModel;
 use Contao\Controller;
+use Contao\FormFieldModel;
+use Contao\FormModel;
+use Markocupic\ContaoContentApi\AugmentedContaoModel;
 
 /**
  * ApiContentElement augments ContentModel for the API.
@@ -14,19 +27,21 @@ use Contao\Controller;
 class ApiContentElement extends AugmentedContaoModel
 {
     /**
-     * constructor.
-     *
-     * @param int    $id       id of the ContentModel
-     * @param string $inColumn In which column does the Content Element reside in
+     * @param int    $id       content model id
+     * @param string $inColumn Column the content element resides in
      */
-    public function __construct($id, $inColumn = 'main')
+    public function __construct(int $id, string $inColumn = 'main')
     {
         $this->model = ContentModel::findById($id, ['published'], ['1']);
+
         if (!$this->model || !Controller::isVisibleElement($this->model)) {
             return $this->model = null;
         }
+
         $this->compiledHtml = null;
+
         $ceClass = 'Contao\Content'.ucfirst($this->model->type);
+
         if (class_exists($ceClass)) {
             try {
                 $compiled = new $ceClass($this->model, $inColumn);
@@ -34,13 +49,16 @@ class ApiContentElement extends AugmentedContaoModel
             } catch (\Exception $e) {
             }
         }
-        if ($this->type === 'module') {
+
+        if ('module' === $this->type) {
             $contentModuleClass = ContentElement::findClass($this->type);
             $element = new $contentModuleClass($this->model, $inColumn);
             $this->subModule = new ApiModule($element->module);
         }
-        if ($this->type === 'form') {
+
+        if ('form' === $this->type) {
             $formModel = FormModel::findById($this->form);
+
             if ($formModel) {
                 $formModel->fields = FormFieldModel::findPublishedByPid($formModel->id);
             }
@@ -49,20 +67,23 @@ class ApiContentElement extends AugmentedContaoModel
     }
 
     /**
-     * Select by Parent ID and Table.
+     * Select by parent id and table.
      *
-     * @param int    $pid      Parent ID
-     * @param string $table    Parent table
-     * @param string $inColumn In which column doe the Content Elements reside in
+     * @param $pid
+     * @param string $inColumn Column the Content Elements resides in
+     *
+     * @return array
      */
-    public static function findByPidAndTable($pid, $table = 'tl_article', $inColumn = 'main')
+    public static function findByPidAndTable($pid, string $table = 'tl_article', string $inColumn = 'main')
     {
         $contents = [];
         $contentModels = ContentModel::findPublishedByPidAndTable($pid, $table, ['order' => 'sorting ASC']);
+
         if (!$contentModels) {
             return $contents;
         }
-        foreach ($contentModels  as $content) {
+
+        foreach ($contentModels as $content) {
             if (!Controller::isVisibleElement($content)) {
                 continue;
             }
@@ -73,12 +94,12 @@ class ApiContentElement extends AugmentedContaoModel
     }
 
     /**
-     * Does this Content Element have a reader module?
+     * Does this content element has a reader module?
      *
      * @param string $readerType What kind of reader? e.g. 'newsreader'
      */
     public function hasReader($readerType): bool
     {
-        return $this->subModule && $this->subModule->type == $readerType;
+        return $this->subModule && $this->subModule->type === $readerType;
     }
 }

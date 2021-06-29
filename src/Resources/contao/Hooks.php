@@ -2,6 +2,7 @@
 
 namespace Markocupic\ContaoContentApi;
 
+use Markocupic\ContaoContentApi\Api\ApiModule;
 use Markocupic\ContaoContentApi\News\ModuleNewsList;
 use Contao\ContentModel;
 use Contao\StringUtil;

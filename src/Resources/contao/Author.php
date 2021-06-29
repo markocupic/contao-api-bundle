@@ -5,7 +5,8 @@ namespace Markocupic\ContaoContentApi;
 use Contao\UserModel;
 
 /**
- * ApiContentElement augments ArticleModel for the API.
+ * Class Author
+ * @package Markocupic\ContaoContentApi
  */
 class Author extends AugmentedContaoModel
 {

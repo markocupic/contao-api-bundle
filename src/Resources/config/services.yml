@@ -8,5 +8,5 @@ services:
 
     Markocupic\ContaoContentApi\:
         resource: ../../
-        exclude: ../../{DependencyInjection,Resources}
+        exclude: ../../{DependencyInjection,Resources,Api}
 
