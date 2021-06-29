@@ -23,8 +23,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Class ContaoFrontendUser
- * @package Markocupic\ContaoContentApi\User\Contao
+ * Class ContaoFrontendUser.
  */
 class ContaoFrontendUser
 {
@@ -84,6 +83,19 @@ class ContaoFrontendUser
         }
 
         return $this->user;
+    }
+
+    public function defineLoginStatusConstants(): void
+    {
+        if (null !== $this->getContaoFrontendUser()) {
+            if (!\defined('FE_USER_LOGGED_IN')) {
+                \define('FE_USER_LOGGED_IN', true);
+            }
+        } else {
+            if (!\defined('FE_USER_LOGGED_IN')) {
+                \define('FE_USER_LOGGED_IN', false);
+            }
+        }
     }
 
     private function getSession(): ?SessionInterface

@@ -59,10 +59,6 @@ class ApiUser implements ContaoJsonSerializable
 
     private function initialize(): void
     {
-        if (null !== ($this->user = $this->contaoFrontendUser->getContaoFrontendUser())) {
-            \define('FE_USER_LOGGED_IN', true);
-        } else {
-            \define('FE_USER_LOGGED_IN', false);
-        }
+        $this->user = $this->contaoFrontendUser->getContaoFrontendUser();
     }
 }

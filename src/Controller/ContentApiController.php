@@ -28,6 +28,7 @@ use Markocupic\ContaoContentApi\Sitemap;
 use Markocupic\ContaoContentApi\SitemapFlat;
 use Markocupic\ContaoContentApi\TextHelper;
 use Markocupic\ContaoContentApi\UrlHelper;
+use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,6 +47,11 @@ class ContentApiController extends Controller
     private $framework;
 
     /**
+     * @var ContaoFrontendUser
+     */
+    private $contaoFrontendUser;
+
+    /**
      * @var ApiUser
      */
     private $apiUser;
@@ -60,9 +66,10 @@ class ContentApiController extends Controller
      */
     private $header;
 
-    public function __construct(ContaoFramework $framework, ApiUser $apiUser)
+    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser, ApiUser $apiUser)
     {
         $this->framework = $framework;
+        $this->contaoFrontendUser = $contaoFrontendUser;
         $this->apiUser = $apiUser;
     }
 
@@ -326,6 +333,9 @@ class ContentApiController extends Controller
 
         // Initialize Contao
         $this->framework->initialize();
+
+        // Define the login status constants 'FE_USER_LOGGED_IN'
+        $this->contaoFrontendUser->defineLoginStatusConstants();
 
         if (!\defined('BE_USER_LOGGED_IN')) {
             \define('BE_USER_LOGGED_IN', false);
