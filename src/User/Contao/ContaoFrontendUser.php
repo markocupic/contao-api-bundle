@@ -12,24 +12,27 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-content-api
  */
 
-namespace Markocupic\ContaoContentApi\User;
+namespace Markocupic\ContaoContentApi\User\Contao;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\CoreBundle\Security\Authentication\Token\TokenChecker;
 use Contao\FrontendUser;
-use Contao\MemberModel;
-use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\ContaoJsonSerializable;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * ApiUser will output the frontend user (member) that is currently logged in.
- * Will return 'null' in case of error.
+ * Class ContaoFrontendUser
+ * @package Markocupic\ContaoContentApi\User\Contao
  */
-class ApiUser implements ContaoJsonSerializable
+class ContaoFrontendUser
 {
+    /**
+     * @var ContaoFramework
+     */
+    private $framework;
+
     /**
      * @var RequestStack
      */
@@ -55,45 +58,32 @@ class ApiUser implements ContaoJsonSerializable
      */
     private $user;
 
-    public function __construct(RequestStack $requestStack, ScopeMatcher $scopeMatcher, TokenChecker $tokenChecker, Security $securityHelper)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher, TokenChecker $tokenChecker, Security $securityHelper)
     {
+        $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->scopeMatcher = $scopeMatcher;
         $this->tokenChecker = $tokenChecker;
         $this->securityHelper = $securityHelper;
     }
 
-    public function initialize(): void
+    public function getContaoFrontendUser(): ?FrontendUser
     {
+        $this->framework->initialize();
+
         // Define the login status constants (see #4099, #5279)
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request && $this->scopeMatcher->isFrontendRequest($request) && ($session = $this->getSession()) && $request->hasPreviousSession()) {
             $session->start();
 
-            \define('FE_USER_LOGGED_IN', $this->tokenChecker->hasFrontendUser());
-
             // Get logged in member object
             if (($objUser = $this->securityHelper->getUser()) instanceof FrontendUser) {
                 $this->user = $objUser;
             }
-        } else {
-            \define('FE_USER_LOGGED_IN', false);
         }
-    }
 
-    public function toJson(): ContaoJson
-    {
-        if (!$this->user || !$this->user->authenticate()) {
-            return new ContaoJson(null);
-        }
-        $model = MemberModel::findById($this->user->id);
-        $model->groups = $this->user->groups;
-        $model->roles = $this->user->getRoles();
-        $model->password = null;
-        $model->session = null;
-
-        return new ContaoJson($model);
+        return $this->user;
     }
 
     private function getSession(): ?SessionInterface

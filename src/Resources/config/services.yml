@@ -10,6 +10,3 @@ services:
         resource: ../../
         exclude: ../../{DependencyInjection,Resources}
 
-    Markocupic\ContaoContentApi\User\ApiUser:
-        calls:
-            - [ initialize ]
