@@ -8,5 +8,9 @@ services:
 
     Markocupic\ContaoContentApi\:
         resource: ../../
-        exclude: ../../{DependencyInjection,Resources,Api}
+        exclude: ../../{DependencyInjection,Resources,Model,Api}
 
+    Markocupic\ContaoContentApi\Api\ApiResource:
+        arguments:
+            - '@service_container'
+            - '@contao.framework'

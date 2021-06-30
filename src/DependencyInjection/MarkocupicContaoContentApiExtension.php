@@ -18,6 +18,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class MarkocupicContaoContentApiExtension.
@@ -39,6 +40,13 @@ class MarkocupicContaoContentApiExtension extends Extension
     {
         $configuration = new Configuration();
 
+        $configBundle = Yaml::parseFile(__DIR__.'/../Resources/config/config.yml');
+
+        $configs = array_merge_recursive(
+            \is_array($configs) ? $configs : [],
+            \is_array($configBundle) ? $configBundle : []
+        );
+
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new YamlFileLoader(
@@ -52,6 +60,7 @@ class MarkocupicContaoContentApiExtension extends Extension
 
         $rootKey = $this->getAlias();
 
-        $container->setParameter($rootKey.'.foo.bar', $config['foo']['bar']);
+        $container->setParameter($rootKey.'.resource_types', $config['resource_types']);
+        $container->setParameter($rootKey.'.resources', $config['resources']);
     }
 }

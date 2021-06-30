@@ -30,9 +30,9 @@ class ApiContentElement extends AugmentedContaoModel
      * @param int    $id       content model id
      * @param string $inColumn Column the content element resides in
      */
-    public function __construct(int $id, string $inColumn = 'main')
+    public function __construct(ApiResource $apiResource, string $inColumn = 'main')
     {
-        $this->model = ContentModel::findById($id, ['published'], ['1']);
+        //$this->model = ContentModel::findById($id, ['published'], ['1']);
 
         if (!$this->model || !Controller::isVisibleElement($this->model)) {
             return $this->model = null;
@@ -53,7 +53,7 @@ class ApiContentElement extends AugmentedContaoModel
         if ('module' === $this->type) {
             $contentModuleClass = ContentElement::findClass($this->type);
             $element = new $contentModuleClass($this->model, $inColumn);
-            $this->subModule = new ApiModule($element->module);
+            $this->subModule = new ApiModule((int) $element->module);
         }
 
         if ('form' === $this->type) {
@@ -87,7 +87,7 @@ class ApiContentElement extends AugmentedContaoModel
             if (!Controller::isVisibleElement($content)) {
                 continue;
             }
-            $contents[] = new self($content->id, $inColumn);
+            $contents[] = new self((int) $content->id, $inColumn);
         }
 
         return $contents;

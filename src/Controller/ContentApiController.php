@@ -17,18 +17,9 @@ namespace Markocupic\ContaoContentApi\Controller;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-use Markocupic\ContaoContentApi\Api\ApiContentElement;
-use Markocupic\ContaoContentApi\Api\ApiModule;
-use Markocupic\ContaoContentApi\Api\ApiUser;
+use Markocupic\ContaoContentApi\Api\ApiResource;
 use Markocupic\ContaoContentApi\ContentApiResponse;
-use Markocupic\ContaoContentApi\Exceptions\ContentApiNotFoundException;
-use Markocupic\ContaoContentApi\File;
-use Markocupic\ContaoContentApi\Page;
-use Markocupic\ContaoContentApi\Reader;
 use Markocupic\ContaoContentApi\Sitemap;
-use Markocupic\ContaoContentApi\SitemapFlat;
-use Markocupic\ContaoContentApi\TextHelper;
-use Markocupic\ContaoContentApi\UrlHelper;
 use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,6 +44,11 @@ class ContentApiController extends Controller
     private $contaoFrontendUser;
 
     /**
+     * @var ApiResource
+     */
+    private $apiResource;
+
+    /**
      * @var null
      */
     private $lang;
@@ -62,10 +58,11 @@ class ContentApiController extends Controller
      */
     private $headers;
 
-    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser)
+    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser, ApiResource $apiResource)
     {
         $this->framework = $framework;
         $this->contaoFrontendUser = $contaoFrontendUser;
+        $this->apiResource = $apiResource;
     }
 
     /**
@@ -73,215 +70,13 @@ class ContentApiController extends Controller
      *
      * @return Response
      *
-     * @Route("/sitemap", name="markocupic_content_api_sitemap")
+     * @Route("/{alias}", name="markocupic_content_api_resource")
      */
-    public function sitemapAction(Request $request)
-    {
-        $request = $this->init($request);
-        $sitemap = new Sitemap($request->query->get('lang', null));
-
-        return new ContentApiResponse($sitemap, 200, $this->headers);
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/sitemap/flat", name="markocupic_content_api_sitemap_flat")
-     */
-    public function sitemapFlatAction(Request $request)
+    public function resourceAction(string $alias, Request $request)
     {
         $request = $this->init($request);
 
-        return new ContentApiResponse(new SitemapFlat($request->query->get('lang', null)), 200, $this->headers);
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/page", name="markocupic_content_api_page")
-     */
-    public function pageAction(Request $request)
-    {
-        $request = $this->init($request);
-
-        try {
-            return new ContentApiResponse(Page::findByUrl($request->query->get('url', null)), 200, $this->headers);
-        } catch (ContentApiNotFoundException $e) {
-            return new ContentApiResponse($e, 404);
-        }
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/user", name="markocupic_content_api_user")
-     */
-    public function userAction(Request $request)
-    {
-        $request = $this->init($request);
-
-        return new ContentApiResponse(new ApiUser($this->contaoFrontendUser), 200, $this->headers);
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/text", name="markocupic_content_api_text")
-     */
-    public function textAction(Request $request)
-    {
-        $request = $this->init($request);
-
-        return new ContentApiResponse(
-            TextHelper::get(
-                explode(',', $request->query->get('file', 'default')),
-                $this->lang
-            ),
-            200,
-            $this->headers
-        );
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/file", name="markocupic_content_api_file")
-     */
-    public function fileAction(Request $request)
-    {
-        $request = $this->init($request);
-
-        return new ContentApiResponse(
-            File::get($request->query->get('path', 'files'), $request->query->get('depth', 0)),
-            200,
-            $this->headers
-        );
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/content_element/{id}", name="markocupic_content_api_content_element", requirements={"id"="\d+"})
-     */
-    public function contentElementAction(Request $request, int $id = 0)
-    {
-        $this->init($request);
-
-        return new ContentApiResponse(new ApiContentElement($id), 200, $this->headers);
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/module/{id}", name="markocupic_content_api_module", requirements={"id"="\d+"})
-     */
-    public function moduleAction(Request $request, int $id = 0)
-    {
-        $this->init($request);
-
-        return new ContentApiResponse(new ApiModule($id), 200, $this->headers);
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/urls", name="markocupic_content_api_urls")
-     */
-    public function urlsAction(Request $request)
-    {
-        $request = $this->init($request);
-        $file = $request->query->get('file', null);
-
-        return new ContentApiResponse(UrlHelper::getUrls($file), 200, $this->headers);
-    }
-
-    /**
-     * @param string  $reader  Reader (e.g. newsreader)
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/{reader}", name="markocupic_content_api_reader")
-     */
-    public function readerAction(string $reader, Request $request)
-    {
-        $request = $this->init($request);
-        $readers = $this->getParameter('content_api_readers');
-
-        if (!$readers[$reader]) {
-            return new ContentApiResponse('Reader "'.$reader.'" not available', 404);
-        }
-        $url = $request->query->get('url', '/');
-        $page = Page::findByUrl($url, false);
-        $readerArticle = null;
-
-        if ($page->hasReader($reader)) {
-            $readerArticle = (new Reader($readers[$reader], $url))->toJson();
-        }
-
-        if (!$readerArticle) {
-            return new ContentApiResponse('No reader found at URL '.$url, 404);
-        }
-
-        return new ContentApiResponse($readerArticle, 200, $this->headers);
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/", name="markocupic_content_api_auto")
-     */
-    public function indexAction(Request $request)
-    {
-        $request = $this->init($request);
-        $readers = $this->getParameter('content_api_readers');
-        $url = $request->query->get('url', '/');
-        $exactMatch = false;
-
-        try {
-            $page = Page::findByUrl($url);
-            $exactMatch = true;
-        } catch (ContentApiNotFoundException $e) {
-            try {
-                $page = Page::findByUrl($url, false);
-            } catch (ContentApiNotFoundException $e) {
-                return new ContentApiResponse($e, 404);
-            }
-        }
-        $response = [
-            'page' => $page ? $page->toJson() : null,
-        ];
-
-        foreach ($readers as $type => $model) {
-            if ($page->hasReader($type)) {
-                $readerFound = true;
-                $response[$type] = (new Reader($model, $url))->toJson();
-            }
-        }
-
-        if (!$readerFound && !$exactMatch) {
-            return new ContentApiResponse('No page and reader found at URL '.$url, 404);
-        }
-
-        return new ContentApiResponse($response, 200, $this->headers);
+        return new ContentApiResponse($this->apiResource->get($alias, $request), 200, $this->headers);
     }
 
     /**

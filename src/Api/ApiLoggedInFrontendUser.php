@@ -21,11 +21,16 @@ use Markocupic\ContaoContentApi\ContaoJsonSerializable;
 use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
 
 /**
- * ApiUser::toJson() will output the frontend user (member) that is currently logged in.
+ * ApiLoggedInFrontendUser::toJson() will output the frontend user (member) that is currently logged in.
  * Will return 'null' in case of error.
  */
-class ApiUser implements ContaoJsonSerializable
+class ApiLoggedInFrontendUser implements ContaoJsonSerializable
 {
+    /**
+     * @var ApiResource
+     */
+    private $apiResource;
+
     /**
      * @var ContaoFrontendUser
      */
@@ -36,16 +41,16 @@ class ApiUser implements ContaoJsonSerializable
      */
     private $user;
 
-    public function __construct(ContaoFrontendUser $contaoFrontendUser)
+    public function __construct(ApiResource $apiResource)
     {
-        $this->contaoFrontendUser = $contaoFrontendUser;
+        $this->apiResource = $apiResource;
+        $this->user = $apiResource->getFrontendUser()->getContaoFrontendUser();
     }
 
     public function toJson(): ContaoJson
     {
-        $this->initialize();
 
-        if (!$this->user || !$this->user->authenticate()) {
+        if (!$this->user) {
             return new ContaoJson(null);
         }
         $model = MemberModel::findById($this->user->id);
@@ -55,10 +60,5 @@ class ApiUser implements ContaoJsonSerializable
         $model->session = null;
 
         return new ContaoJson($model);
-    }
-
-    private function initialize(): void
-    {
-        $this->user = $this->contaoFrontendUser->getContaoFrontendUser();
     }
 }

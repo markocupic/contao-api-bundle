@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of Contao Content Api.
- * 
+ *
  * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -10,20 +12,14 @@
  * @link https://github.com/markocupic/contao-content-api
  */
 
-namespace Markocupic\ContaoContentApi;
+namespace Markocupic\ContaoContentApi\Model;
 
-
-use Markocupic\ContaoContentApi\Model\ApiModel;
-
-/**
- * Backend modules
- */
-$GLOBALS['BE_MOD']['api']['api_item'] = array(
-    'tables' => array('tl_api')
-);
+use Contao\Model;
 
 /**
- * Models
+ * Class ApiModel.
  */
-$GLOBALS['TL_MODELS']['tl_api'] = ApiModel::class;
-
+class ApiModel extends Model
+{
+    protected static $strTable = 'tl_api';
+}
