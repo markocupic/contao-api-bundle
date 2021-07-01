@@ -12,26 +12,20 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-content-api
  */
 
-namespace Markocupic\ContaoContentApi\Api;
+namespace Markocupic\ContaoContentApi\Manager;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\ContaoContentApi\DependencyInjection\Configuration;
 use Markocupic\ContaoContentApi\Model\ApiModel;
 use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ApiResource
+class ApiResourceManager
 {
     /**
      * @var ContainerInterface
      */
     public $container;
-
-    /**
-     * @var ContaoFramework
-     */
-    public $framework;
 
     /**
      * @var ContaoFrontendUser
@@ -43,6 +37,12 @@ class ApiResource
      */
     public $request;
 
+    private $resources = [];
+
+    private $services = [];
+
+    private $resource;
+
     /**
      * @var array
      */
@@ -53,28 +53,35 @@ class ApiResource
      */
     private $apiModel;
 
-    public function __construct(ContainerInterface $container, ContaoFramework $framework, ContaoFrontendUser $user)
+    public function __construct(ContainerInterface $container, ContaoFrontendUser $user)
     {
         $this->container = $container;
-        $this->framework = $framework;
         $this->user = $user;
     }
 
-    public function get(string $strAlias, Request $request)
+    /**
+     * Add a resource for given alias.
+     *
+     * @param ResourceInterface $resource
+     */
+    public function add($resource, string $alias, string $id): void
     {
-        $this->request = $request;
+        $this->resources[$alias] = $resource;
+        $this->services[$alias] = $id;
+    }
 
+    public function get(string $strAlias)
+    {
         if ($this->setResourceFromAlias($strAlias)) {
-            $resType = $this->getResourceTypeFromAlias($strAlias);
-
-            if (null !== $resType && isset($resType['class'])) {
-                $strClass = $resType['class'];
-
-                if (class_exists($strClass)) {
-                    return new $strClass($this);
-                }
-            }
+            return $this;
         }
+
+        return null;
+    }
+
+    public function show()
+    {
+        return $this->resource->get($this);
     }
 
     public function getData(): ?array
@@ -102,34 +109,17 @@ class ApiResource
 
             foreach ($resources as $resource) {
                 if ($resource['name'] === $apiRes->resourceType) {
-                    $this->data = $resource;
-                    $this->apiModel = $apiRes;
+                    if (isset($resource['type']) && isset($this->resources[$resource['type']])) {
+                        $this->resource = $this->resources[$resource['type']];
+                        $this->data = $resource;
+                        $this->apiModel = $apiRes;
 
-                    return true;
+                        return true;
+                    }
                 }
             }
         }
 
         return false;
-    }
-
-    private function getResourceTypeFromAlias(string $strAlias): ?array
-    {
-        $this->setResourceFromAlias($strAlias);
-        $resource = $this->getData();
-
-        if (null !== $resource && isset($resource['type'])) {
-            $ns = Configuration::ROOT_KEY;
-
-            $resourceTypes = $this->container->getParameter($ns.'.resource_types');
-
-            foreach ($resourceTypes as $resourceType) {
-                if ($resourceType['name'] === $resource['type']) {
-                    return $resourceType;
-                }
-            }
-        }
-
-        return null;
     }
 }

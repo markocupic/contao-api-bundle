@@ -1,7 +1,5 @@
 markocupic_contao_content_api:
-    resource_types:
-        - { name: contao_frontend_module, class: "\\Markocupic\\ContaoContentApi\\Api\\ApiFrontendModule" }
-        - { name: contao_logged_in_frontend_user, class: "\\Markocupic\\ContaoContentApi\\Api\\ApiLoggedInFrontendUser" }
+
     resources:
         - { name: contao_frontend_module, type: contao_frontend_module, modelClass: "\\Contao\\ModuleModel", verboseName: "Get a Contao frontend module."}
         - { name: contao_logged_in_frontend_user, type: contao_logged_in_frontend_user, modelClass: "\\Contao\\MemberModel", verboseName: "Get details about the logged in Contao Frontend user."}

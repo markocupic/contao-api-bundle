@@ -10,7 +10,10 @@ services:
         resource: ../../
         exclude: ../../{DependencyInjection,Resources,Model,Api}
 
-    Markocupic\ContaoContentApi\Api\ApiResource:
-        arguments:
-            - '@service_container'
-            - '@contao.framework'
+    markocupic.api.manager.resource:
+        class: Markocupic\ContaoContentApi\Manager\ApiResourceManager
+
+    markocupic.api.resource.contao_frontend_module:
+        class: Markocupic\ContaoContentApi\Api\ApiFrontendModule
+        tags:
+            - { name: markocupic.api.resource, alias: contao_frontend_module }

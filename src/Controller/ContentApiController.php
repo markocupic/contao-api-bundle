@@ -17,8 +17,8 @@ namespace Markocupic\ContaoContentApi\Controller;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-use Markocupic\ContaoContentApi\Api\ApiResource;
 use Markocupic\ContaoContentApi\ContentApiResponse;
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Sitemap;
 use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -46,7 +46,7 @@ class ContentApiController extends Controller
     /**
      * @var ApiResource
      */
-    private $apiResource;
+    private $apiSelector;
 
     /**
      * @var null
@@ -58,11 +58,11 @@ class ContentApiController extends Controller
      */
     private $headers;
 
-    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser, ApiResource $apiResource)
+    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser, ApiResourceManager $apiSelector)
     {
         $this->framework = $framework;
         $this->contaoFrontendUser = $contaoFrontendUser;
-        $this->apiResource = $apiResource;
+        $this->apiSelector = $apiSelector;
     }
 
     /**
@@ -74,9 +74,19 @@ class ContentApiController extends Controller
      */
     public function resourceAction(string $alias, Request $request)
     {
-        $request = $this->init($request);
+        $this->init($request);
 
-        return new ContentApiResponse($this->apiResource->get($alias, $request), 200, $this->headers);
+        if(null === $resource = $this->get('markocupic.api.manager.resource')->get($alias))
+        {
+            return $this->json(
+                ['message' => sprintf(
+                    'Could not find any service that match to %s alias.',
+                    $alias)
+                ]
+            );
+        }
+
+        return new ContentApiResponse($resource->show(), 200, $this->headers);
     }
 
     /**

@@ -14,18 +14,21 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Api;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Module;
 use Contao\ModuleModel;
 use Contao\ModuleProxy;
 use Contao\StringUtil;
-use Markocupic\ContaoContentApi\AugmentedContaoModel;
+use Markocupic\ContaoContentApi\ContaoJson;
+use Markocupic\ContaoContentApi\ContaoJsonSerializable;
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Model\ApiModel;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class ApiFrontendModule.
  */
-class ApiFrontendModule extends AugmentedContaoModel
+class ApiFrontendModule implements ContaoJsonSerializable
 {
     /**
      * @var ModuleModel|null
@@ -33,29 +36,39 @@ class ApiFrontendModule extends AugmentedContaoModel
     public $model;
 
     /**
-     * @var Request
+     * @var ContaoFramework
      */
-    private $request;
+    private $framework;
 
     /**
-     * ApiModule constructor.
+     * @var RequestStack
      */
-    public function __construct(ApiResource $apiResource)
+    private $requestStack;
+
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
+    {
+        $this->framework = $framework;
+        $this->requestStack = $requestStack;
+    }
+
+    public function get(ApiResourceManager $apiResource): self
     {
         /** @var ApiModel $apiModel */
         $apiModel = $apiResource->getApiModel();
 
-        $request = $apiResource->request;
+        $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->has('id')) {
             $id = $request->query->get('id');
 
             if (null !== $apiModel) {
-                $arrAllowedModules = StringUtil::deserialize($apiModel->allowedModules, true);
+                $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+                $arrAllowedModules = $stringUtilAdapter->deserialize($apiModel->allowedModules, true);
 
                 if (\in_array($id, $arrAllowedModules, false)) {
                     if (null !== ($this->model = ModuleModel::findByPk($id))) {
-                        $moduleClass = Module::findClass($this->model->type);
+                        $moduleAdapter = $this->framework->getAdapter(Module::class);
+                        $moduleClass = $moduleAdapter->findClass($this->model->type);
 
                         try {
                             $strColumn = null;
@@ -67,6 +80,7 @@ class ApiFrontendModule extends AugmentedContaoModel
 
                             $module = new $moduleClass($this->model, $strColumn);
                             $this->model->compiledHTML = @$module->generate() ?? null;
+
                         } catch (\Exception $e) {
                             $this->model->compiledHTML = null;
                         }
@@ -80,5 +94,16 @@ class ApiFrontendModule extends AugmentedContaoModel
                 $callback[0]::{$callback[1]}($this, $moduleClass);
             }
         }
+
+        return $this;
+    }
+
+    public function toJson(): ContaoJson
+    {
+        if (!$this->model) {
+            return new ContaoJson(null);
+        }
+
+        return new ContaoJson($this->model);
     }
 }
