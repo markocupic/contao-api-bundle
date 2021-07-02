@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Api;
 
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
-use Markocupic\ContaoContentApi\Model\ApiModel;
 use Markocupic\ContaoContentApi\ContaoJson;
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
+use Markocupic\ContaoContentApi\Model\AppModel;
 
 /**
  * Interface ApiInterface.
@@ -25,7 +25,7 @@ interface ApiInterface
 {
     public function toJson(): ContaoJson;
 
-    public function isAllowed(ApiModel $apiModel, int $id): bool;
+    public function isAllowed(AppModel $apiModel, int $id): bool;
 
     public function get(ApiResourceManager $apiManager): self;
 }

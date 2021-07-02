@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Manager;
 
+use Markocupic\ContaoContentApi\Api\ApiInterface;
 use Markocupic\ContaoContentApi\DependencyInjection\Configuration;
-use Markocupic\ContaoContentApi\Model\ApiModel;
+use Markocupic\ContaoContentApi\Model\AppModel;
 use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,12 +47,12 @@ class ApiResourceManager
     /**
      * @var array
      */
-    private $apiConfig;
+    private $resConfig;
 
     /**
-     * @var ApiModel
+     * @var AppModel
      */
-    private $apiModel;
+    private $appModel;
 
     public function __construct(ContainerInterface $container, ContaoFrontendUser $user)
     {
@@ -70,10 +71,14 @@ class ApiResourceManager
         $this->services[$alias] = $id;
     }
 
-    public function get(string $strAlias)
+    public function get(string $strAlias): ?self
     {
-        if ($this->setResourceFromAlias($strAlias)) {
-            return $this;
+        if (null !== ($this->appModel = AppModel::findOneByAlias($strAlias))) {
+            if (null !== ($this->resConfig = $this->getResConfigFromAlias($strAlias))) {
+                $this->resource = $this->resources[$this->resConfig['type']];
+
+                return $this;
+            }
         }
 
         return null;
@@ -85,17 +90,16 @@ class ApiResourceManager
     }
 
     /**
-     * Return data current resource in config.yml
-     * @return array|null
+     * Return data current resource in config.yml.
      */
     public function getApiConfig(): ?array
     {
-        return $this->apiConfig;
+        return $this->resConfig;
     }
 
-    public function getApiModel(): ?ApiModel
+    public function getAppModel(): ?AppModel
     {
-        return $this->apiModel;
+        return $this->appModel;
     }
 
     public function getFrontendUser(): ?ContaoFrontendUser
@@ -103,9 +107,9 @@ class ApiResourceManager
         return $this->user;
     }
 
-    private function setResourceFromAlias(string $strAlias): bool
+    private function getResConfigFromAlias(string $strAlias): ?array
     {
-        $apiRes = ApiModel::findOneByAlias($strAlias);
+        $apiRes = AppModel::findOneByAlias($strAlias);
 
         if (null !== $apiRes) {
             $ns = Configuration::ROOT_KEY;
@@ -114,16 +118,12 @@ class ApiResourceManager
             foreach ($resources as $resource) {
                 if ($resource['name'] === $apiRes->resourceType) {
                     if (isset($resource['type'], $this->resources[$resource['type']])) {
-                        $this->resource = $this->resources[$resource['type']];
-                        $this->apiConfig = $resource;
-                        $this->apiModel = $apiRes;
-
-                        return true;
+                        return $resource;
                     }
                 }
             }
         }
 
-        return false;
+        return null;
     }
 }

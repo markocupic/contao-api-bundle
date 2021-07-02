@@ -19,9 +19,9 @@ use Contao\System;
 use Markocupic\ContaoContentApi\DependencyInjection\Configuration;
 
 /**
- * Table tl_api
+ * Table tl_app
  */
-$GLOBALS['TL_DCA']['tl_api'] = array(
+$GLOBALS['TL_DCA']['tl_app'] = array(
 	// Config
 	'config'      => array(
 		'dataContainer'    => 'Table',
@@ -32,12 +32,12 @@ $GLOBALS['TL_DCA']['tl_api'] = array(
 			)
 		),
 		'onload_callback'  => array(
-			array('tl_api', 'setPalette'),
+			array('tl_app', 'setPalette'),
 		)
 	),
 	'edit'        => array(
 		'buttons_callback' => array(
-			array('tl_api', 'buttonsCallback')
+			array('tl_app', 'buttonsCallback')
 		)
 	),
 	'list'        => array(
@@ -61,23 +61,23 @@ $GLOBALS['TL_DCA']['tl_api'] = array(
 		),
 		'operations'        => array(
 			'edit'   => array(
-				'label' => &$GLOBALS['TL_LANG']['tl_api']['edit'],
+				'label' => &$GLOBALS['TL_LANG']['tl_app']['edit'],
 				'href'  => 'act=edit',
 				'icon'  => 'edit.gif'
 			),
 			'copy'   => array(
-				'label' => &$GLOBALS['TL_LANG']['tl_api']['copy'],
+				'label' => &$GLOBALS['TL_LANG']['tl_app']['copy'],
 				'href'  => 'act=copy',
 				'icon'  => 'copy.gif'
 			),
 			'delete' => array(
-				'label'      => &$GLOBALS['TL_LANG']['tl_api']['delete'],
+				'label'      => &$GLOBALS['TL_LANG']['tl_app']['delete'],
 				'href'       => 'act=delete',
 				'icon'       => 'delete.gif',
 				'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
 			),
 			'show'   => array(
-				'label'      => &$GLOBALS['TL_LANG']['tl_api']['show'],
+				'label'      => &$GLOBALS['TL_LANG']['tl_app']['show'],
 				'href'       => 'act=show',
 				'icon'       => 'show.gif',
 				'attributes' => 'style="margin-right:3px"'
@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_api'] = array(
 			'search'    => true,
 			'filter'    => true,
 			'sorting'   => true,
-			'options_callback' => array('tl_api', 'getResourceTypes'),
+			'options_callback' => array('tl_app', 'getResourceTypes'),
 			'eval'      => array('includeBlankOption' => true, 'submitOnChange' => true, 'tl_class' => 'w50'),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
@@ -140,7 +140,7 @@ $GLOBALS['TL_DCA']['tl_api'] = array(
 			'search'    => true,
 			'filter'    => true,
 			'sorting'   => true,
-			'options_callback' => array('tl_api', 'getFrontendModules'),
+			'options_callback' => array('tl_app', 'getFrontendModules'),
 			'eval'      => array('includeBlankOption' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'w50'),
 			'sql'       => "blob NULL",
 		)
@@ -148,9 +148,9 @@ $GLOBALS['TL_DCA']['tl_api'] = array(
 );
 
 /**
- * Class tl_api
+ * Class tl_app
  */
-class tl_api extends Backend
+class tl_app extends Backend
 {
 	/**
 	 * @param $arrButtons
@@ -161,7 +161,7 @@ class tl_api extends Backend
 	{
 		if (Input::get('act') === 'edit')
 		{
-			$arrButtons['customButton'] = '<button type="submit" name="customButton" id="customButton" class="tl_submit customButton" accesskey="x">' . $GLOBALS['TL_LANG']['tl_api']['customButton'] . '</button>';
+			$arrButtons['customButton'] = '<button type="submit" name="customButton" id="customButton" class="tl_submit customButton" accesskey="x">' . $GLOBALS['TL_LANG']['tl_app']['customButton'] . '</button>';
 		}
 
 		return $arrButtons;

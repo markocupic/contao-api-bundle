@@ -21,7 +21,7 @@ use Contao\ModuleProxy;
 use Contao\StringUtil;
 use Markocupic\ContaoContentApi\ContaoJson;
 use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
-use Markocupic\ContaoContentApi\Model\ApiModel;
+use Markocupic\ContaoContentApi\Model\AppModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -52,9 +52,8 @@ class ApiFrontendModule implements ApiInterface
 
     public function get(ApiResourceManager $apiManager): self
     {
-        /** @var ApiModel $apiModel */
-        $apiModel = $apiManager->getApiModel();
-
+        /** @var AppModel $appModel */
+        $appModel = $apiManager->getAppModel();
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->has('id')) {
@@ -64,8 +63,8 @@ class ApiFrontendModule implements ApiInterface
             $configData = $apiManager->getApiConfig();
 
             if (null !== ($this->model = $configData['modelClass']::findByPk($id))) {
-                if (null !== $apiModel) {
-                    if (!$this->isAllowed($apiModel, (int) $id)) {
+                if (null !== $appModel) {
+                    if (!$this->isAllowed($appModel, (int) $id)) {
                         $this->model->message = 'Access to this resource is not allowed!';
                         $this->model->compiledHTML = null;
                     } else {
@@ -99,10 +98,10 @@ class ApiFrontendModule implements ApiInterface
         return $this;
     }
 
-    public function isAllowed(ApiModel $apiModel, int $id): bool
+    public function isAllowed(AppModel $appModel, int $id): bool
     {
         $adapter = $this->framework->getAdapter(StringUtil::class);
-        $arrAllowed = $adapter->deserialize($apiModel->allowedModules, true);
+        $arrAllowed = $adapter->deserialize($appModel->allowedModules, true);
 
         return \in_array($id, $arrAllowed, false);
     }

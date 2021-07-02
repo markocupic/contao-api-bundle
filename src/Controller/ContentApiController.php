@@ -16,6 +16,7 @@ namespace Markocupic\ContaoContentApi\Controller;
 
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Contao\System;
 use Markocupic\ContaoContentApi\ContentApiResponse;
 use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
@@ -63,6 +64,31 @@ class ContentApiController extends Controller
         $this->framework = $framework;
         $this->contaoFrontendUser = $contaoFrontendUser;
         $this->apiSelector = $apiSelector;
+    }
+
+    /**
+     * @param Request $request Current request
+     *
+     * @return Response
+     *
+     * @Route("/test", name="markocupic_content_api_test")
+     */
+    public function testAction(Request $request)
+    {
+        $arr = [];
+        $objDB = Database::getInstance()
+            ->prepare('SELECT * FROM tl_files WHERE id > 0')
+            ->limit(2)
+            ->execute()
+        ;
+
+        while($objDB->next())
+        {
+            $arr[] = ['path' => $objDB->path, 'uuid' => $objDB->uuid];
+        }
+
+        return $this->json($arr);
+
     }
 
     /**
