@@ -2,7 +2,7 @@
 
 /*
  * This file is part of Contao Content Api.
- * 
+ *
  * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -12,18 +12,16 @@
 
 namespace Markocupic\ContaoContentApi;
 
-
 use Markocupic\ContaoContentApi\Model\ApiModel;
 
 /**
  * Backend modules
  */
 $GLOBALS['BE_MOD']['api']['api_item'] = array(
-    'tables' => array('tl_api')
+	'tables' => array('tl_api')
 );
 
 /**
  * Models
  */
 $GLOBALS['TL_MODELS']['tl_api'] = ApiModel::class;
-

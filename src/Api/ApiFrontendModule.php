@@ -20,7 +20,6 @@ use Contao\ModuleModel;
 use Contao\ModuleProxy;
 use Contao\StringUtil;
 use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\ContaoJsonSerializable;
 use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Model\ApiModel;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,7 +27,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Class ApiFrontendModule.
  */
-class ApiFrontendModule implements ContaoJsonSerializable
+class ApiFrontendModule implements ApiInterface
 {
     /**
      * @var ModuleModel|null
@@ -51,24 +50,27 @@ class ApiFrontendModule implements ContaoJsonSerializable
         $this->requestStack = $requestStack;
     }
 
-    public function get(ApiResourceManager $apiResource): self
+    public function get(ApiResourceManager $apiManager): self
     {
         /** @var ApiModel $apiModel */
-        $apiModel = $apiResource->getApiModel();
+        $apiModel = $apiManager->getApiModel();
 
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->has('id')) {
             $id = $request->query->get('id');
 
-            if (null !== $apiModel) {
-                $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-                $arrAllowedModules = $stringUtilAdapter->deserialize($apiModel->allowedModules, true);
+            // Get config data from current resource defined in config.yml
+            $configData = $apiManager->getApiConfig();
 
-                if (\in_array($id, $arrAllowedModules, false)) {
-                    if (null !== ($this->model = ModuleModel::findByPk($id))) {
-                        $moduleAdapter = $this->framework->getAdapter(Module::class);
-                        $moduleClass = $moduleAdapter->findClass($this->model->type);
+            if (null !== ($this->model = $configData['modelClass']::findByPk($id))) {
+                if (null !== $apiModel) {
+                    if (!$this->isAllowed($apiModel, (int) $id)) {
+                        $this->model->message = 'Access to this resource is not allowed!';
+                        $this->model->compiledHTML = null;
+                    } else {
+                        $adapter = $this->framework->getAdapter(Module::class);
+                        $moduleClass = $adapter->findClass($this->model->type);
 
                         try {
                             $strColumn = null;
@@ -80,7 +82,6 @@ class ApiFrontendModule implements ContaoJsonSerializable
 
                             $module = new $moduleClass($this->model, $strColumn);
                             $this->model->compiledHTML = @$module->generate() ?? null;
-
                         } catch (\Exception $e) {
                             $this->model->compiledHTML = null;
                         }
@@ -96,6 +97,14 @@ class ApiFrontendModule implements ContaoJsonSerializable
         }
 
         return $this;
+    }
+
+    public function isAllowed(ApiModel $apiModel, int $id): bool
+    {
+        $adapter = $this->framework->getAdapter(StringUtil::class);
+        $arrAllowed = $adapter->deserialize($apiModel->allowedModules, true);
+
+        return \in_array($id, $arrAllowed, false);
     }
 
     public function toJson(): ContaoJson

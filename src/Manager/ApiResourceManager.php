@@ -46,7 +46,7 @@ class ApiResourceManager
     /**
      * @var array
      */
-    private $data;
+    private $apiConfig;
 
     /**
      * @var ApiModel
@@ -84,9 +84,13 @@ class ApiResourceManager
         return $this->resource->get($this);
     }
 
-    public function getData(): ?array
+    /**
+     * Return data current resource in config.yml
+     * @return array|null
+     */
+    public function getApiConfig(): ?array
     {
-        return $this->data;
+        return $this->apiConfig;
     }
 
     public function getApiModel(): ?ApiModel
@@ -109,9 +113,9 @@ class ApiResourceManager
 
             foreach ($resources as $resource) {
                 if ($resource['name'] === $apiRes->resourceType) {
-                    if (isset($resource['type']) && isset($this->resources[$resource['type']])) {
+                    if (isset($resource['type'], $this->resources[$resource['type']])) {
                         $this->resource = $this->resources[$resource['type']];
-                        $this->data = $resource;
+                        $this->apiConfig = $resource;
                         $this->apiModel = $apiRes;
 
                         return true;

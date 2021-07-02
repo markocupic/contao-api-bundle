@@ -76,12 +76,12 @@ class ContentApiController extends Controller
     {
         $this->init($request);
 
-        if(null === $resource = $this->get('markocupic.api.manager.resource')->get($alias))
-        {
+        if (null === $resource = $this->get('markocupic.content_api.manager.resource')->get($alias)) {
             return $this->json(
                 ['message' => sprintf(
                     'Could not find any service that match to %s alias.',
-                    $alias)
+                    $alias
+                ),
                 ]
             );
         }

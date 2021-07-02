@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of Contao Content Api.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-content-api
+ */
+
 namespace Markocupic\ContaoContentApi;
 
 /**
@@ -9,51 +19,61 @@ namespace Markocupic\ContaoContentApi;
  */
 class SitemapFlat implements ContaoJsonSerializable
 {
-    public $sitemap;
+	public $sitemap;
 
-    /**
-     * constructor.
-     *
-     * @param string $language If set, ignores other languages
-     */
-    public function __construct(string $language = null)
-    {
-        $sitemap = new Sitemap($language);
-        $this->sitemap = $sitemap->sitemapFlat;
-    }
+	/**
+	 * constructor.
+	 *
+	 * @param string $language If set, ignores other languages
+	 */
+	public function __construct(string $language = null)
+	{
+		$sitemap = new Sitemap($language);
+		$this->sitemap = $sitemap->sitemapFlat;
+	}
 
-    public function findUrl($url, $exactMatch = true)
-    {
-        if (substr($url, 0, 1) == '/') {
-            $url = substr($url, 1);
-        }
-        $url = \mb_strtolower($url);
-        $page = $this->sitemap->{$url} ?? null;
-        if ($page) {
-            $page['exactUrlMatch'] = true;
+	public function findUrl($url, $exactMatch = true)
+	{
+		if (substr($url, 0, 1) == '/')
+		{
+			$url = substr($url, 1);
+		}
+		$url = mb_strtolower($url);
+		$page = $this->sitemap->{$url} ?? null;
 
-            return $page;
-        }
-        if ($exactMatch) {
-            return null;
-        }
-        $matches = [];
-        foreach ($this->sitemap as $_url => $_page) {
-            if (substr($url, 0, strlen($_url)) === $_url) {
-                $matches[$_url] = strlen($_url);
-            }
-        }
-        if ($matches) {
-            arsort($matches);
+		if ($page)
+		{
+			$page['exactUrlMatch'] = true;
 
-            return $this->sitemap->{\key($matches)};
-        }
+			return $page;
+		}
 
-        return null;
-    }
+		if ($exactMatch)
+		{
+			return null;
+		}
+		$matches = array();
 
-    public function toJson(): ContaoJson
-    {
-        return new ContaoJson($this->sitemap);
-    }
+		foreach ($this->sitemap as $_url => $_page)
+		{
+			if (substr($url, 0, \strlen($_url)) === $_url)
+			{
+				$matches[$_url] = \strlen($_url);
+			}
+		}
+
+		if ($matches)
+		{
+			arsort($matches);
+
+			return $this->sitemap->{key($matches)};
+		}
+
+		return null;
+	}
+
+	public function toJson(): ContaoJson
+	{
+		return new ContaoJson($this->sitemap);
+	}
 }

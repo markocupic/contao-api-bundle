@@ -27,8 +27,8 @@ use Markocupic\ContaoContentApi\AugmentedContaoModel;
 class ApiContentElement extends AugmentedContaoModel
 {
     /**
-     * @param int    $id       content model id
-     * @param string $inColumn Column the content element resides in
+     * @param int    $apiResource content model id
+     * @param string $inColumn    Column the content element resides in
      */
     public function __construct(ApiResource $apiResource, string $inColumn = 'main')
     {

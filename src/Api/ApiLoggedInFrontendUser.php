@@ -49,7 +49,6 @@ class ApiLoggedInFrontendUser implements ContaoJsonSerializable
 
     public function toJson(): ContaoJson
     {
-
         if (!$this->user) {
             return new ContaoJson(null);
         }

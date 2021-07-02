@@ -1,9 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * This file is part of Contao Content Api.
  *
- * @license LGPL-3.0-or-later
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-content-api
  */
 
 namespace Markocupic\ContaoContentApi\DependencyInjection\Compiler;
@@ -17,22 +23,20 @@ use Symfony\Component\DependencyInjection\Reference;
 class ApiResourcePass implements CompilerPassInterface
 {
     /**
-     * @param ContainerBuilder $container
-     *
      * @throws ServiceNotFoundException
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        $definition = $container->findDefinition('markocupic.api.manager.resource');
+        $definition = $container->findDefinition('markocupic.content_api.manager.resource');
 
         // find all service IDs with the huh.api.resource tag
-        $taggedServices = $container->findTaggedServiceIds('markocupic.api.resource');
+        $taggedServices = $container->findTaggedServiceIds('markocupic.content_api.resource');
 
         foreach ($taggedServices as $id => $tags) {
             // a service could have the same tag twice
             foreach ($tags as $attributes) {
                 if (!isset($attributes['alias'])) {
-                    throw new InvalidArgumentException(sprintf('Missing tag information "alias" on markocupic.api.resource tagged service "%s".', $id));
+                    throw new InvalidArgumentException(sprintf('Missing tag information "alias" on markocupic.content_api.resource tagged service "%s".', $id));
                 }
 
                 $definition->addMethodCall(
