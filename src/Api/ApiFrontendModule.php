@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\ContaoContentApi\Api;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\FrontendUser;
 use Contao\Module;
 use Contao\ModuleModel;
 use Contao\ModuleProxy;
@@ -56,7 +57,7 @@ class ApiFrontendModule implements ApiInterface
         $this->apiUtil = $apiUtil;
     }
 
-    public function show($strAlias): self
+    public function show($strAlias, ?FrontendUser $user): self
     {
         /** @var AppModel $appModel */
         $appAdapter = $this->framework->getAdapter(AppModel::class);

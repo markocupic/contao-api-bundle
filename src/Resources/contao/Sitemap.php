@@ -18,7 +18,7 @@ use Contao\PageModel;
  * Sitemap represents the actual site structure as an object tree.
  * The resulting instance can be iterated and used like an array.
  */
-class Sitemap implements \IteratorAggregate, \ArrayAccess, \Countable, ContaoJsonSerializable
+class Sitemap implements \IteratorAggregate, \ArrayAccess, \Countable
 {
 	protected $sitemap = array();
 	public $sitemapFlat;

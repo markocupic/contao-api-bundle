@@ -104,11 +104,11 @@ class ContentApiController extends Controller
 
         if (null === $resource = $this->get('markocupic.contao_content_api.manager.resource')->get($strAlias, $user)) {
             return $this->json(
-                ['message' => sprintf('Could not find any service that match to %s alias.',$strAlias)]
+                ['message' => sprintf('Could not find any service that match to %s alias.', $strAlias)]
             );
         }
 
-        return new ContentApiResponse($resource->show($strAlias), 200, $this->headers);
+        return new ContentApiResponse($resource->show($strAlias, $user), 200, $this->headers);
     }
 
     /**

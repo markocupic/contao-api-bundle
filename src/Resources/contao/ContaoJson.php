@@ -16,7 +16,6 @@ use Contao\Controller;
 use Contao\Model;
 use Contao\Model\Collection;
 use Contao\StringUtil;
-use Markocupic\ContaoContentApi\Api\ApiInterface;
 
 /**
  * ContaoJson tries to pack "everything Contao" into a JSON-serializable package.
@@ -63,14 +62,14 @@ class ContaoJson implements \JsonSerializable
 			return;
 		}
 
-		if ($data instanceof ApiInterface)
+		if ($data instanceof ContaoJsonSerializable)
 		{
-		    $data = $data->toJson();
+			$data = $data->toJson();
 		}
 
 		if ($data instanceof self)
 		{
-		    return $this->data = $data;
+			return $this->data = $data;
 		}
 
 		if ($data instanceof Collection)
@@ -80,7 +79,7 @@ class ContaoJson implements \JsonSerializable
 
 		if ($data instanceof Model)
 		{
-		    $data = $data->row();
+			$data = $data->row();
 		}
 
 		if (\is_array($data))

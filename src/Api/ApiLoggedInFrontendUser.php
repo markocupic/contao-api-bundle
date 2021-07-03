@@ -14,37 +14,37 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Api;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\MemberModel;
 use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\ContaoJsonSerializable;
-use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
+use Markocupic\ContaoContentApi\Model\AppModel;
 
 /**
  * ApiLoggedInFrontendUser::toJson() will output the frontend user (member) that is currently logged in.
  * Will return 'null' in case of error.
  */
-class ApiLoggedInFrontendUser implements ContaoJsonSerializable
+class ApiLoggedInFrontendUser implements ApiInterface
 {
     /**
-     * @var ApiResource
+     * @var ContaoFramework
      */
-    private $apiResource;
-
-    /**
-     * @var ContaoFrontendUser
-     */
-    private $contaoFrontendUser;
+    private $framework;
 
     /**
      * @var FrontendUser
      */
     private $user;
 
-    public function __construct(ApiResource $apiResource)
+    public function __construct(ContaoFramework $framework)
     {
-        $this->apiResource = $apiResource;
-        $this->user = $apiResource->getFrontendUser()->getContaoFrontendUser();
+        $this->framework = $framework;
+    }
+
+    public function show($strAlias, $user): self
+    {
+        $this->user = $user;
+        return $this;
     }
 
     public function toJson(): ContaoJson
@@ -52,12 +52,20 @@ class ApiLoggedInFrontendUser implements ContaoJsonSerializable
         if (!$this->user) {
             return new ContaoJson(null);
         }
-        $model = MemberModel::findById($this->user->id);
+
+        $memberModel = $this->framework->getAdapter(MemberModel::class);
+
+        $model = $memberModel->findById($this->user->id);
         $model->groups = $this->user->groups;
         $model->roles = $this->user->getRoles();
         $model->password = null;
         $model->session = null;
 
         return new ContaoJson($model);
+    }
+
+    public function isAllowed(AppModel $apiModel, int $id): bool
+    {
+        return true;
     }
 }

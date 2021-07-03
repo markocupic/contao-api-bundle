@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Api;
 
+use Contao\FrontendUser;
 use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Model\AppModel;
 
 /**
@@ -27,5 +27,5 @@ interface ApiInterface
 
     public function isAllowed(AppModel $apiModel, int $id): bool;
 
-    public function show(string $stringAlias): self;
+    public function show(string $stringAlias, ?FrontendUser $user): self;
 }
