@@ -75,7 +75,6 @@ class ContentApiController extends Controller
      */
     public function testAction(Request $request)
     {
-        die(print_r($this->getUser()->getUsername(), true));
         $arr = [];
         $objDB = Database::getInstance()
             ->prepare('SELECT * FROM tl_files WHERE id > 0')

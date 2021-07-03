@@ -91,6 +91,7 @@ class ApiFrontendModule implements ApiInterface
 
                             $module = new $moduleClass($this->model, $strColumn);
                             $this->model->compiledHTML = @$module->generate() ?? null;
+
                         } catch (\Exception $e) {
                             $this->model->compiledHTML = null;
                         }
