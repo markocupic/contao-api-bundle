@@ -27,16 +27,16 @@ class ApiResourcePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $definition = $container->findDefinition('markocupic.content_api.manager.resource');
+        $definition = $container->findDefinition('markocupic.contao_content_api.manager.resource');
 
         // find all service IDs with the huh.api.resource tag
-        $taggedServices = $container->findTaggedServiceIds('markocupic.content_api.resource');
+        $taggedServices = $container->findTaggedServiceIds('markocupic.contao_content_api.resource');
 
         foreach ($taggedServices as $id => $tags) {
             // a service could have the same tag twice
             foreach ($tags as $attributes) {
                 if (!isset($attributes['alias'])) {
-                    throw new InvalidArgumentException(sprintf('Missing tag information "alias" on markocupic.content_api.resource tagged service "%s".', $id));
+                    throw new InvalidArgumentException(sprintf('Missing tag information "alias" on markocupic.contao_content_api.resource tagged service "%s".', $id));
                 }
 
                 $definition->addMethodCall(

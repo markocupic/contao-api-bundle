@@ -27,5 +27,5 @@ interface ApiInterface
 
     public function isAllowed(AppModel $apiModel, int $id): bool;
 
-    public function get(ApiResourceManager $apiManager): self;
+    public function show(string $stringAlias): self;
 }

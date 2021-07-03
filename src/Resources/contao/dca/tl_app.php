@@ -173,10 +173,13 @@ class tl_app extends Backend
 	public function getResourceTypes(): array
 	{
 		$opt = array();
-		$rootKey = Configuration::ROOT_KEY;
-		$resources = System::getContainer()->getParameter($rootKey . '.resources');
+		$resources = System::getContainer()->getParameter('markocupic.contao_content_api');
 
-		foreach ($resources as $resource)
+		if(!isset($resources['resources'])){
+		    throw new \Exception('No resources set in markocupic.contao_content_api');
+        }
+
+		foreach ($resources['resources'] as $resource)
 		{
 			$opt[$resource['name']] = $resource['name'];
 		}

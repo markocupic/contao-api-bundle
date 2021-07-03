@@ -30,7 +30,7 @@ class MarkocupicContaoContentApiExtension extends Extension
      */
     public function getAlias()
     {
-        return Configuration::ROOT_KEY;
+        return 'markocupic_contao_content_api';
     }
 
     /**
@@ -58,8 +58,6 @@ class MarkocupicContaoContentApiExtension extends Extension
         $loader->load('services.yml');
         $loader->load('listener.yml');
 
-        $rootKey = $this->getAlias();
-
-        $container->setParameter($rootKey.'.resources', $config['resources']);
+        $container->setParameter('markocupic.contao_content_api', $config['contao_content_api']);
     }
 }

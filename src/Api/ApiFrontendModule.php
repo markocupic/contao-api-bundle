@@ -20,8 +20,8 @@ use Contao\ModuleModel;
 use Contao\ModuleProxy;
 use Contao\StringUtil;
 use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Util\ApiUtil;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -44,23 +44,31 @@ class ApiFrontendModule implements ApiInterface
      */
     private $requestStack;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
+    /**
+     * @var ApiUtil
+     */
+    private $apiUtil;
+
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ApiUtil $apiUtil)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
+        $this->apiUtil = $apiUtil;
     }
 
-    public function get(ApiResourceManager $apiManager): self
+    public function show($strAlias): self
     {
         /** @var AppModel $appModel */
-        $appModel = $apiManager->getAppModel();
+        $appAdapter = $this->framework->getAdapter(AppModel::class);
+        $appModel = $appAdapter->findOneByAlias($strAlias);
+
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->has('id')) {
             $id = $request->query->get('id');
 
             // Get config data from current resource defined in config.yml
-            $configData = $apiManager->getApiConfig();
+            $configData = $this->apiUtil->getResourceConfigByName($appModel->resourceType);
 
             if (null !== ($this->model = $configData['modelClass']::findByPk($id))) {
                 if (null !== $appModel) {
@@ -68,8 +76,9 @@ class ApiFrontendModule implements ApiInterface
                         $this->model->message = 'Access to this resource is not allowed!';
                         $this->model->compiledHTML = null;
                     } else {
-                        $adapter = $this->framework->getAdapter(Module::class);
-                        $moduleClass = $adapter->findClass($this->model->type);
+                        /** @var Module $moduleAdapter */
+                        $moduleAdapter = $this->framework->getAdapter(Module::class);
+                        $moduleClass = $moduleAdapter->findClass($this->model->type);
 
                         try {
                             $strColumn = null;

@@ -75,6 +75,7 @@ class ContentApiController extends Controller
      */
     public function testAction(Request $request)
     {
+        die(print_r($this->getUser()->getUsername(), true));
         $arr = [];
         $objDB = Database::getInstance()
             ->prepare('SELECT * FROM tl_files WHERE id > 0')
@@ -82,13 +83,11 @@ class ContentApiController extends Controller
             ->execute()
         ;
 
-        while($objDB->next())
-        {
+        while ($objDB->next()) {
             $arr[] = ['path' => $objDB->path, 'uuid' => $objDB->uuid];
         }
 
         return $this->json($arr);
-
     }
 
     /**
@@ -96,23 +95,20 @@ class ContentApiController extends Controller
      *
      * @return Response
      *
-     * @Route("/{alias}", name="markocupic_content_api_resource")
+     * @Route("/{strAlias}", name="markocupic_content_api_resource")
      */
-    public function resourceAction(string $alias, Request $request)
+    public function resourceAction(string $strAlias, Request $request)
     {
         $this->init($request);
+        $user = $this->getUser();
 
-        if (null === $resource = $this->get('markocupic.content_api.manager.resource')->get($alias)) {
+        if (null === $resource = $this->get('markocupic.contao_content_api.manager.resource')->get($strAlias, $user)) {
             return $this->json(
-                ['message' => sprintf(
-                    'Could not find any service that match to %s alias.',
-                    $alias
-                ),
-                ]
+                ['message' => sprintf('Could not find any service that match to %s alias.',$strAlias)]
             );
         }
 
-        return new ContentApiResponse($resource->show(), 200, $this->headers);
+        return new ContentApiResponse($resource->show($strAlias), 200, $this->headers);
     }
 
     /**
