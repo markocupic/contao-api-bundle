@@ -27,7 +27,7 @@ class ApiUtil implements FrameworkAwareInterface, ContainerAwareInterface
 
     public function getResourceConfigByName(string $resourceName): ?array
     {
-        $resources = System::getContainer()->getParameter('markocupic.contao_content_api');
+        $resources = System::getContainer()->getParameter('markocupic_contao_content_api');
 
         if (!isset($resources['resources'])) {
             return null;
@@ -41,46 +41,47 @@ class ApiUtil implements FrameworkAwareInterface, ContainerAwareInterface
 
         return null;
     }
-    /**
-    public function getResourceConfigByModelClass(string $modelClass)
-    {
-        $resources = System::getContainer()->getParameter('markocupic.contao_content_api');
 
-        if (!isset($resources['api']['resources'])) {
-            return false;
-        }
-
-        foreach ($resources['api']['resources'] as $resource) {
-            if ($resource['modelClass'] === $modelClass) {
-                return $resource;
-            }
-        }
-
-        return false;
-    }
-
-    public function getResourceFieldOptions(string $resourceName)
-    {
-        $resourceConfig = $this->container->get('huh.api.util.api_util')->getResourceConfigByName($resourceName);
-
-        if (!\is_array($resourceConfig) || !class_exists($resourceConfig['modelClass'])) {
-            return [];
-        }
-
-        return $this->container->get('huh.utils.choice.field')->getCachedChoices([
-            'dataContainer' => $resourceConfig['modelClass']::getTable(),
-        ]);
-    }
-
-    public function getEntityTableByApp(ApiAppModel $app)
-    {
-        $config = $this->getResourceConfigByName($app->resource);
-
-        if (!isset($config['modelClass']) || !class_exists($config['modelClass'])) {
-            return false;
-        }
-
-        return $config['modelClass']::getTable();
-    }
-     **/
+    /*
+     * public function getResourceConfigByModelClass(string $modelClass)
+     * {
+     * $resources = System::getContainer()->getParameter('markocupic_contao_content_api');
+     *
+     * if (!isset($resources['api']['resources'])) {
+     * return false;
+     * }
+     *
+     * foreach ($resources['api']['resources'] as $resource) {
+     * if ($resource['modelClass'] === $modelClass) {
+     * return $resource;
+     * }
+     * }
+     *
+     * return false;
+     * }
+     *
+     * public function getResourceFieldOptions(string $resourceName)
+     * {
+     * $resourceConfig = $this->container->get('huh.api.util.api_util')->getResourceConfigByName($resourceName);
+     *
+     * if (!\is_array($resourceConfig) || !class_exists($resourceConfig['modelClass'])) {
+     * return [];
+     * }
+     *
+     * return $this->container->get('huh.utils.choice.field')->getCachedChoices([
+     * 'dataContainer' => $resourceConfig['modelClass']::getTable(),
+     * ]);
+     * }
+     *
+     * public function getEntityTableByApp(ApiAppModel $app)
+     * {
+     * $config = $this->getResourceConfigByName($app->resource);
+     *
+     * if (!isset($config['modelClass']) || !class_exists($config['modelClass'])) {
+     * return false;
+     * }
+     *
+     * return $config['modelClass']::getTable();
+     * }
+     */
 }

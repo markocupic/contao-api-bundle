@@ -19,24 +19,20 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('markocupic');
+        $treeBuilder = new TreeBuilder('markocupic_contao_content_api');
 
         $treeBuilder->getRootNode()
             ->children()
-                ->arrayNode('contao_content_api')
-                    ->children()
-                        ->arrayNode('resources')
-                            ->arrayPrototype()
-                                ->children()
-                                    ->scalarNode('name')->cannotBeEmpty()->end()
-                                    ->scalarNode('type')->cannotBeEmpty()->end()
-                                    ->scalarNode('modelClass')->cannotBeEmpty()->end()
-                                    ->scalarNode('verboseName')->cannotBeEmpty()->end()
-                                ->end()
-                            ->end()
+                ->booleanNode('enabled')->defaultTrue()->end()
+                ->arrayNode('resources')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->cannotBeEmpty()->end()
+                            ->scalarNode('type')->cannotBeEmpty()->end()
+                            ->scalarNode('modelClass')->cannotBeEmpty()->end()
+                            ->scalarNode('verboseName')->cannotBeEmpty()->end()
                         ->end()
                     ->end()
                 ->end()

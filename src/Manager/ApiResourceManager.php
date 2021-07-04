@@ -69,7 +69,6 @@ class ApiResourceManager
                 if (null === ($resource = $this->resources[$resConfig['type']])) {
                     throw new \Exception(sprintf('Resource "%s" not found.', $resConfig['type']));
                 }
-
                 return $resource;
             }
         }

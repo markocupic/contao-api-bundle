@@ -16,6 +16,7 @@ namespace Markocupic\ContaoContentApi;
 
 use Markocupic\ContaoContentApi\DependencyInjection\Compiler\ApiResourcePass;
 use Markocupic\ContaoContentApi\DependencyInjection\MarkocupicContaoContentApiExtension;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

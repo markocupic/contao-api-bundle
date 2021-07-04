@@ -58,6 +58,7 @@ class MarkocupicContaoContentApiExtension extends Extension
         $loader->load('services.yml');
         $loader->load('listener.yml');
 
-        $container->setParameter('markocupic.contao_content_api', $config['contao_content_api']);
+
+        $container->setParameter('markocupic_contao_content_api', $config);
     }
 }

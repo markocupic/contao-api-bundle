@@ -15,14 +15,11 @@ declare(strict_types=1);
 namespace Markocupic\ContaoContentApi\Controller;
 
 use Contao\Config;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\System;
 use Markocupic\ContaoContentApi\ContentApiResponse;
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
+use Markocupic\ContaoContentApi\Model\AppModel;
 use Markocupic\ContaoContentApi\Sitemap;
-use Markocupic\ContaoContentApi\User\Contao\ContaoFrontendUser;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,97 +29,74 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("/_mc_cc_api", defaults={"_scope" = "frontend", "_token_check" = false})
  */
-class ContentApiController extends Controller
+class ContentApiController extends AbstractController
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+
 
     /**
-     * @var ContaoFrontendUser
+     * @Route("/test", name="markocupic_contao_content_api_test")
      */
-    private $contaoFrontendUser;
-
-    /**
-     * @var ApiResource
-     */
-    private $apiSelector;
-
-    /**
-     * @var null
-     */
-    private $lang;
-
-    /**
-     * @var string
-     */
-    private $headers;
-
-    public function __construct(ContaoFramework $framework, ContaoFrontendUser $contaoFrontendUser, ApiResourceManager $apiSelector)
-    {
-        $this->framework = $framework;
-        $this->contaoFrontendUser = $contaoFrontendUser;
-        $this->apiSelector = $apiSelector;
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/test", name="markocupic_content_api_test")
-     */
-    public function testAction(Request $request)
-    {
-        $arr = [];
-        $objDB = Database::getInstance()
-            ->prepare('SELECT * FROM tl_files WHERE id > 0')
-            ->limit(2)
-            ->execute()
-        ;
-
-        while ($objDB->next()) {
-            $arr[] = ['path' => $objDB->path, 'uuid' => $objDB->uuid];
-        }
-
-        return $this->json($arr);
-    }
-
-    /**
-     * @param Request $request Current request
-     *
-     * @return Response
-     *
-     * @Route("/{strAlias}", name="markocupic_content_api_resource")
-     */
-    public function resourceAction(string $strAlias, Request $request)
+    public function testAction(Request $request): Response
     {
         $this->init($request);
-        $user = $this->getUser();
 
-        if (null === $resource = $this->get('markocupic.contao_content_api.manager.resource')->get($strAlias, $user)) {
+        $response = new Response('message');
+
+        return $response;
+    }
+
+    /**
+     * @Route("/show/{strAlias}", name="markocupic_contao_content_api_show")
+     */
+    public function showAction(string $strAlias, Request $request): Response
+    {
+        $this->init($request);
+
+        $user = $this->container->get('security.helper')->getUser();
+
+        if (!$this->hasValidKey($strAlias, $request)) {
+            return $this->json(
+                ['message' => 'Access denied due to invalid key.']
+            );
+        }
+
+        if (null === $resource = $this->container->get('markocupic_contao_content_api.manager.resource')->get($strAlias, $user)) {
             return $this->json(
                 ['message' => sprintf('Could not find any service that match to %s alias.', $strAlias)]
             );
         }
 
-        return new ContentApiResponse($resource->show($strAlias, $user), 200, $this->headers);
+
+        return new ContentApiResponse($resource->show($strAlias, $user));
+    }
+
+    private function hasValidKey(string $strAlias, Request $request): bool
+    {
+        if ($request->query->has('key')) {
+            $adapter = $this->container->get('contao.framework')->getAdapter(AppModel::class);
+            $appModel = $adapter->findOneByAlias($strAlias);
+
+            if (null !== $appModel) {
+                if ($request->query->get('key') === $appModel->key) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
      * Called at the begin of every request.
-     *
-     * @param Request $request Current request
      */
     private function init(Request $request): Request
     {
         // Commit die if disabled
-        if (!$this->getParameter('content_api_enabled')) {
+        $config = $this->container->getParameter('markocupic_contao_content_api');
+
+        if (!$config['enabled']) {
             die('Content API is disabled');
         }
-
-        $this->headers = $this->getParameter('content_api_headers');
 
         if (isset($GLOBALS['TL_HOOKS']['apiBeforeInit']) && \is_array($GLOBALS['TL_HOOKS']['apiBeforeInit'])) {
             foreach ($GLOBALS['TL_HOOKS']['apiBeforeInit'] as $callback) {
@@ -135,9 +109,9 @@ class ContentApiController extends Controller
 
         // Set the language
         if ($request->query->has('_locale')) {
-            $this->lang = $request->query->get('_locale');
+            $lang = $request->query->get('_locale');
         } elseif ($request->query->has('lang')) {
-            $this->lang = $request->query->get('lang');
+            $lang = $request->query->get('lang');
         } elseif (Config::get('addLanguageToUrl') && $request->query->has('url')) {
             $url = $request->query->get('url');
 
@@ -145,32 +119,35 @@ class ContentApiController extends Controller
                 $url = "/$url";
             }
             $urlParts = explode('/', $url);
-            $this->lang = \count($urlParts) > 1 && 2 === \strlen($urlParts[1]) ? $urlParts[1] : null;
+            $lang = \count($urlParts) > 1 && 2 === \strlen($urlParts[1]) ? $urlParts[1] : null;
         }
 
-        if (!$this->lang) {
+        if (!$lang) {
             $sitemap = new Sitemap();
 
             foreach ($sitemap as $rootPage) {
                 if ($rootPage->fallback) {
-                    $this->lang = $rootPage->language;
+                    $lang = $rootPage->language;
                     break;
                 }
             }
         }
 
-        if ($this->lang) {
-            System::loadLanguageFile('default', $this->lang);
+        if ($lang) {
+            System::loadLanguageFile('default', $lang);
         } else {
             // Use Contao fallback language
             System::loadLanguageFile('default', 'undefined');
         }
 
         // Initialize Contao
-        $this->framework->initialize();
+        $this->container->get('contao.framework')->initialize();
 
         // Define the login status constants 'FE_USER_LOGGED_IN'
-        $this->contaoFrontendUser->defineLoginStatusConstants();
+        $this->container
+            ->get('markocupic_contao_content_api.user.contao.frontend')
+            ->defineLoginStatusConstants()
+        ;
 
         if (!\defined('BE_USER_LOGGED_IN')) {
             \define('BE_USER_LOGGED_IN', false);
