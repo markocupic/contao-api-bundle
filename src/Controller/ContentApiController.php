@@ -17,7 +17,7 @@ namespace Markocupic\ContaoContentApi\Controller;
 use Contao\Config;
 use Contao\System;
 use Markocupic\ContaoContentApi\ContentApiResponse;
-use Markocupic\ContaoContentApi\Model\ApiAppModel;
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Sitemap;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,15 +31,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ContentApiController extends AbstractController
 {
-    /**
-     * @Route("/test", name="markocupic_contao_content_api_test")
-     */
-    public function testAction(Request $request): Response
-    {
-        $this->init($request);
-
-        return new Response('message');
-    }
+    
 
     /**
      * @Route("/show/{strKey}", name="markocupic_contao_content_api_show")
@@ -50,31 +42,22 @@ class ContentApiController extends AbstractController
 
         $user = $this->container->get('security.helper')->getUser();
 
-        if (!$this->hasValidKey($strKey, $request)) {
-            return $this->json(
-                ['message' => 'Access denied due to invalid key.']
-            );
+        /** @var ApiResourceManager $manager */
+        $manager = $this->container->get('markocupic_contao_content_api.manager.resource');
+
+        if (!$manager->hasValidKey($strKey)) {
+            return $this->json(['message' => 'Access denied due to invalid key.']);
         }
 
-        if (null === $resource = $this->container->get('markocupic_contao_content_api.manager.resource')->get($strKey, $user)) {
-            return $this->json(
-                ['message' => sprintf('Could not find any service that match to %s key.', $strKey)]
-            );
+        if (!$manager->isUserAllowed($strKey, $user)) {
+            return $this->json(['message' => 'Access denied due protected resource.']);
+        }
+
+        if (null === $resource = $manager->get($strKey, $user)) {
+            return $this->json(['message' => sprintf('Could not find any service that match to %s key.', $strKey)]);
         }
 
         return new ContentApiResponse($resource->show($strKey, $user));
-    }
-
-    private function hasValidKey(string $strKey, Request $request): bool
-    {
-        $adapter = $this->container->get('contao.framework')->getAdapter(ApiAppModel::class);
-        $apiAppModel = $adapter->findOneByKey($strKey);
-
-        if (null !== $apiAppModel) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -137,7 +120,8 @@ class ContentApiController extends AbstractController
         // Define the login status constants 'FE_USER_LOGGED_IN'
         $this->container
             ->get('markocupic_contao_content_api.user.contao.frontend')
-            ->defineLoginStatusConstants();
+            ->defineLoginStatusConstants()
+        ;
 
         if (!\defined('BE_USER_LOGGED_IN')) {
             \define('BE_USER_LOGGED_IN', false);

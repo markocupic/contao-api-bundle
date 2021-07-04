@@ -30,7 +30,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ApiFrontendModule implements ApiInterface
 {
-    use ApiTrait;
 
     /**
      * @var ModuleModel|null
@@ -75,11 +74,7 @@ class ApiFrontendModule implements ApiInterface
 
             if (null !== ($this->model = $configData['modelClass']::findByPk($id))) {
                 if (null !== $apiAppModel) {
-                    // Check if user is allowed to access protected resource
-                    if (!$this->isMemberAllowed($apiAppModel, $user)) {
-                        $this->model->message = 'Denied access to a protected resource.';
-                        $this->model->compiledHTML = null;
-                    } elseif (!$this->isAllowed($apiAppModel, (int) $id)) {
+                    if (!$this->isAllowed($apiAppModel, (int) $id)) {
                         $this->model->message = 'Access to this resource is not allowed!';
                         $this->model->compiledHTML = null;
                     } else {

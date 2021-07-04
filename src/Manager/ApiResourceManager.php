@@ -16,6 +16,7 @@ namespace Markocupic\ContaoContentApi\Manager;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
+use Contao\StringUtil;
 use Markocupic\ContaoContentApi\Api\ApiInterface;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Markocupic\ContaoContentApi\Util\ApiUtil;
@@ -75,5 +76,40 @@ class ApiResourceManager
         }
 
         return null;
+    }
+
+    public function hasValidKey(string $strKey): bool
+    {
+        $adapter = $this->framework->getAdapter(ApiAppModel::class);
+        $apiAppModel = $adapter->findOneByKey($strKey);
+
+        if (null !== $apiAppModel) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isUserAllowed(string $strKey, ?FrontendUser $user): bool
+    {
+        /** @var ApiAppModel $apiAppAdapter */
+        $apiAppAdapter = $this->framework->getAdapter(ApiAppModel::class);
+
+        if (null === $apiAppModel = $apiAppAdapter->findOneByKey($strKey)) {
+            return false;
+        }
+
+        if ($apiAppModel->mProtect) {
+            if (!$user) {
+                return false;
+            }
+
+            $arrMemberGroups = StringUtil::deserialize($user->groups, true);
+            $arrAppGroups = StringUtil::deserialize($apiAppModel->mGroups, true);
+
+            return array_intersect($arrAppGroups, $arrMemberGroups) ? true : false;
+        }
+
+        return true;
     }
 }
