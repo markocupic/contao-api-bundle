@@ -17,7 +17,7 @@ namespace Markocupic\ContaoContentApi\Controller;
 use Contao\Config;
 use Contao\System;
 use Markocupic\ContaoContentApi\ContentApiResponse;
-use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Markocupic\ContaoContentApi\Sitemap;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,8 +31,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ContentApiController extends AbstractController
 {
-
-
     /**
      * @Route("/test", name="markocupic_contao_content_api_test")
      */
@@ -40,9 +38,7 @@ class ContentApiController extends AbstractController
     {
         $this->init($request);
 
-        $response = new Response('message');
-
-        return $response;
+        return new Response('message');
     }
 
     /**
@@ -66,18 +62,17 @@ class ContentApiController extends AbstractController
             );
         }
 
-
         return new ContentApiResponse($resource->show($strAlias, $user));
     }
 
     private function hasValidKey(string $strAlias, Request $request): bool
     {
         if ($request->query->has('key')) {
-            $adapter = $this->container->get('contao.framework')->getAdapter(AppModel::class);
-            $appModel = $adapter->findOneByAlias($strAlias);
+            $adapter = $this->container->get('contao.framework')->getAdapter(ApiAppModel::class);
+            $apiAppModel = $adapter->findOneByAlias($strAlias);
 
-            if (null !== $appModel) {
-                if ($request->query->get('key') === $appModel->key) {
+            if (null !== $apiAppModel) {
+                if ($request->query->get('key') === $apiAppModel->key) {
                     return true;
                 }
             }

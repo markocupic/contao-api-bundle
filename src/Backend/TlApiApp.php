@@ -1,26 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * This file is part of Contao Content Api.
  *
- * @license LGPL-3.0-or-later
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-content-api
  */
 
 namespace Markocupic\ContaoContentApi\Backend;
 
-use Contao\BackendUser;
-use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\Database;
 use Contao\DataContainer;
-use Contao\Image;
-use Contao\StringUtil;
-use Contao\System;
-use HeimrichHannot\ApiBundle\Model\ApiAppModel;
-use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
 
-class TlApp
+class TlApiApp
 {
     /**
      * @var ContaoFramework
@@ -32,7 +30,6 @@ class TlApp
         $this->framework = $framework;
     }
 
-
     public function generateApiToken($value, DataContainer $dc)
     {
         if ('' !== $value) {
@@ -40,7 +37,7 @@ class TlApp
         }
 
         /** @var ApiAppModel $adapter */
-        $adapter = $this->framework->getAdapter(AppModel::class);
+        $adapter = $this->framework->getAdapter(ApiAppModel::class);
 
         if (null === ($model = $adapter->findByPk($dc->id))) {
             return $value;
@@ -51,5 +48,4 @@ class TlApp
 
         return $model->key;
     }
-
 }

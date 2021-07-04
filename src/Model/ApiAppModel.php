@@ -17,9 +17,9 @@ namespace Markocupic\ContaoContentApi\Model;
 use Contao\Model;
 
 /**
- * Class AppModel.
+ * Class ApiAppModel.
  */
-class AppModel extends Model
+class ApiAppModel extends Model
 {
-    protected static $strTable = 'tl_app';
+    protected static $strTable = 'tl_api_app';
 }

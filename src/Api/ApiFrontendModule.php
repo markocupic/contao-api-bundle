@@ -21,7 +21,7 @@ use Contao\ModuleModel;
 use Contao\ModuleProxy;
 use Contao\StringUtil;
 use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Markocupic\ContaoContentApi\Util\ApiUtil;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -59,9 +59,9 @@ class ApiFrontendModule implements ApiInterface
 
     public function show($strAlias, ?FrontendUser $user): self
     {
-        /** @var AppModel $appModel */
-        $appAdapter = $this->framework->getAdapter(AppModel::class);
-        $appModel = $appAdapter->findOneByAlias($strAlias);
+        /** @var ApiAppModel $apiAppModel */
+        $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
+        $apiAppModel = $appAdapter->findOneByAlias($strAlias);
 
         $request = $this->requestStack->getCurrentRequest();
 
@@ -69,11 +69,11 @@ class ApiFrontendModule implements ApiInterface
             $id = $request->query->get('id');
 
             // Get config data from current resource defined in config.yml
-            $configData = $this->apiUtil->getResourceConfigByName($appModel->resourceType);
+            $configData = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType);
 
             if (null !== ($this->model = $configData['modelClass']::findByPk($id))) {
-                if (null !== $appModel) {
-                    if (!$this->isAllowed($appModel, (int) $id)) {
+                if (null !== $apiAppModel) {
+                    if (!$this->isAllowed($apiAppModel, (int) $id)) {
                         $this->model->message = 'Access to this resource is not allowed!';
                         $this->model->compiledHTML = null;
                     } else {
@@ -108,10 +108,10 @@ class ApiFrontendModule implements ApiInterface
         return $this;
     }
 
-    public function isAllowed(AppModel $appModel, int $id): bool
+    public function isAllowed(ApiAppModel $apiAppModel, int $id): bool
     {
         $adapter = $this->framework->getAdapter(StringUtil::class);
-        $arrAllowed = $adapter->deserialize($appModel->allowedModules, true);
+        $arrAllowed = $adapter->deserialize($apiAppModel->allowedModules, true);
 
         return \in_array($id, $arrAllowed, false);
     }

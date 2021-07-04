@@ -16,7 +16,7 @@ namespace Markocupic\ContaoContentApi\Api;
 
 use Contao\FrontendUser;
 use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
 
 /**
  * Interface ApiInterface.
@@ -25,7 +25,7 @@ interface ApiInterface
 {
     public function toJson(): ContaoJson;
 
-    public function isAllowed(AppModel $apiModel, int $id): bool;
+    public function isAllowed(ApiAppModel $apiModel, int $id): bool;
 
     public function show(string $stringAlias, ?FrontendUser $user): self;
 }

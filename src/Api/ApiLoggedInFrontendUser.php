@@ -18,7 +18,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\MemberModel;
 use Markocupic\ContaoContentApi\ContaoJson;
-use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
 
 /**
  * ApiLoggedInFrontendUser::toJson() will output the frontend user (member) that is currently logged in.
@@ -44,6 +44,7 @@ class ApiLoggedInFrontendUser implements ApiInterface
     public function show($strAlias, $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -64,7 +65,7 @@ class ApiLoggedInFrontendUser implements ApiInterface
         return new ContaoJson($model);
     }
 
-    public function isAllowed(AppModel $apiModel, int $id): bool
+    public function isAllowed(ApiAppModel $apiModel, int $id): bool
     {
         return true;
     }

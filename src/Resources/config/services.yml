@@ -16,8 +16,8 @@ services:
         resource: ../../
         exclude: ../../{DependencyInjection,Resources,Model,Api}
 
-    markocupic_contao_content_api.backend.app:
-        class: Markocupic\ContaoContentApi\Backend\TlApp
+    markocupic_contao_content_api.backend.api_app:
+        class: Markocupic\ContaoContentApi\Backend\TlApiApp
 
     markocupic_contao_content_api.controller.content_api:
         class: Markocupic\ContaoContentApi\Controller\ContentApiController

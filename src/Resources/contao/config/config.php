@@ -12,16 +12,16 @@
 
 namespace Markocupic\ContaoContentApi;
 
-use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
 
 /**
  * Backend modules
  */
 $GLOBALS['BE_MOD']['api']['api_item'] = array(
-	'tables' => array('tl_app')
+	'tables' => array('tl_api_app')
 );
 
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_app'] = AppModel::class;
+$GLOBALS['TL_MODELS']['tl_api_app'] = ApiAppModel::class;

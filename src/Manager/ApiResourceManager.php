@@ -17,7 +17,7 @@ namespace Markocupic\ContaoContentApi\Manager;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Markocupic\ContaoContentApi\Api\ApiInterface;
-use Markocupic\ContaoContentApi\Model\AppModel;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Markocupic\ContaoContentApi\Util\ApiUtil;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -62,13 +62,14 @@ class ApiResourceManager
 
     public function get(string $strAlias, ?FrontendUser $user): ?ApiInterface
     {
-        $appAdapter = $this->framework->getAdapter(AppModel::class);
+        $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
 
-        if (null !== ($appModel = $appAdapter->findOneByAlias($strAlias))) {
-            if (null !== ($resConfig = $this->apiUtil->getResourceConfigByName($appModel->resourceType))) {
+        if (null !== ($apiAppModel = $appAdapter->findOneByAlias($strAlias))) {
+            if (null !== ($resConfig = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType))) {
                 if (null === ($resource = $this->resources[$resConfig['type']])) {
                     throw new \Exception(sprintf('Resource "%s" not found.', $resConfig['type']));
                 }
+
                 return $resource;
             }
         }
