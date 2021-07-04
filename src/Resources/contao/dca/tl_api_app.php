@@ -85,15 +85,15 @@ $GLOBALS['TL_DCA']['tl_api_app'] = array(
 	),
 	// Palettes
 	'palettes'    => array(
-		'__selector__'                   => array('addSubpalette'),
+		'__selector__'                   => array('mProtect'),
 		'default'                        => '{first_legend},title,resourceType',
-		'contao_frontend_module'         => '{first_legend},title,resourceType;{resource_settings},alias,allowedModules;{security_settings},key',
-		'contao_logged_in_frontend_user' => '{first_legend},title,resourceType;{resource_settings},alias;{security_settings},key',
+		'contao_frontend_module'         => '{first_legend},title,resourceType;{resource_settings},allowedModules;{security_settings},key,mProtect',
+		'contao_logged_in_frontend_user' => '{first_legend},title,resourceType;{resource_settings};{security_settings},key',
 	),
 
 	// Subpalettes
 	'subpalettes' => array(
-		'addSubpalette' => 'textareaField',
+		'mProtect' => 'mGroups',
 	),
 	// Fields
 	'fields'      => array(
@@ -123,16 +123,6 @@ $GLOBALS['TL_DCA']['tl_api_app'] = array(
 			'eval'             => array('includeBlankOption' => true, 'submitOnChange' => true, 'tl_class' => 'w50'),
 			'sql'              => "varchar(255) NOT NULL default ''",
 		),
-		'alias'          => array(
-			'inputType' => 'text',
-			'exclude'   => true,
-			'search'    => true,
-			'filter'    => true,
-			'sorting'   => true,
-			'flag'      => 1,
-			'eval'      => array('mandatory' => true, 'unique' => true, 'rgxp' => 'custom', 'customRgxp' => '/^[a-zA-Z1-9-_]+$/', 'maxlength' => 255, 'tl_class' => 'w50'),
-			'sql'       => "varchar(255) NOT NULL default ''",
-		),
 		'allowedModules' => array(
 			'inputType'        => 'select',
 			'exclude'          => true,
@@ -146,9 +136,25 @@ $GLOBALS['TL_DCA']['tl_api_app'] = array(
 		'key'            => array(
 			'search'        => true,
 			'inputType'     => 'text',
-			'load_callback' => array(array('markocupic_contao_content_api.backend.app', 'generateApiToken')),
+			'load_callback' => array(
+				array('markocupic_contao_content_api.backend.api_app', 'generateApiToken'),
+			),
 			'eval'          => array('tl_class' => 'clr long', 'unique' => true),
 			'sql'           => "varchar(255) NOT NULL default ''",
+		),
+		'mProtect'       => array(
+			'exclude'   => true,
+			'inputType' => 'checkbox',
+			'eval'      => array('submitOnChange' => true, 'tl_class' => 'w50'),
+			'sql'       => "char(1) NOT NULL default ''",
+		),
+		'mGroups'        => array(
+			'exclude'    => true,
+			'inputType'  => 'checkbox',
+			'foreignKey' => 'tl_member_group.name',
+			'eval'       => array('multiple' => true, 'tl_class' => 'w50'),
+			'sql'        => "blob NULL",
+			'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
 		),
 	),
 );

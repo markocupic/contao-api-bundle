@@ -41,7 +41,7 @@ class ApiLoggedInFrontendUser implements ApiInterface
         $this->framework = $framework;
     }
 
-    public function show($strAlias, $user): self
+    public function show($strKey, $user): self
     {
         $this->user = $user;
 

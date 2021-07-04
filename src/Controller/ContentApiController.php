@@ -42,40 +42,36 @@ class ContentApiController extends AbstractController
     }
 
     /**
-     * @Route("/show/{strAlias}", name="markocupic_contao_content_api_show")
+     * @Route("/show/{strKey}", name="markocupic_contao_content_api_show")
      */
-    public function showAction(string $strAlias, Request $request): Response
+    public function showAction(string $strKey, Request $request): Response
     {
         $this->init($request);
 
         $user = $this->container->get('security.helper')->getUser();
 
-        if (!$this->hasValidKey($strAlias, $request)) {
+        if (!$this->hasValidKey($strKey, $request)) {
             return $this->json(
                 ['message' => 'Access denied due to invalid key.']
             );
         }
 
-        if (null === $resource = $this->container->get('markocupic_contao_content_api.manager.resource')->get($strAlias, $user)) {
+        if (null === $resource = $this->container->get('markocupic_contao_content_api.manager.resource')->get($strKey, $user)) {
             return $this->json(
-                ['message' => sprintf('Could not find any service that match to %s alias.', $strAlias)]
+                ['message' => sprintf('Could not find any service that match to %s key.', $strKey)]
             );
         }
 
-        return new ContentApiResponse($resource->show($strAlias, $user));
+        return new ContentApiResponse($resource->show($strKey, $user));
     }
 
-    private function hasValidKey(string $strAlias, Request $request): bool
+    private function hasValidKey(string $strKey, Request $request): bool
     {
-        if ($request->query->has('key')) {
-            $adapter = $this->container->get('contao.framework')->getAdapter(ApiAppModel::class);
-            $apiAppModel = $adapter->findOneByAlias($strAlias);
+        $adapter = $this->container->get('contao.framework')->getAdapter(ApiAppModel::class);
+        $apiAppModel = $adapter->findOneByKey($strKey);
 
-            if (null !== $apiAppModel) {
-                if ($request->query->get('key') === $apiAppModel->key) {
-                    return true;
-                }
-            }
+        if (null !== $apiAppModel) {
+            return true;
         }
 
         return false;
@@ -141,8 +137,7 @@ class ContentApiController extends AbstractController
         // Define the login status constants 'FE_USER_LOGGED_IN'
         $this->container
             ->get('markocupic_contao_content_api.user.contao.frontend')
-            ->defineLoginStatusConstants()
-        ;
+            ->defineLoginStatusConstants();
 
         if (!\defined('BE_USER_LOGGED_IN')) {
             \define('BE_USER_LOGGED_IN', false);

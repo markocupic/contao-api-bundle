@@ -60,11 +60,11 @@ class ApiResourceManager
         $this->services[$alias] = $id;
     }
 
-    public function get(string $strAlias, ?FrontendUser $user): ?ApiInterface
+    public function get(string $strKey, ?FrontendUser $user): ?ApiInterface
     {
         $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
 
-        if (null !== ($apiAppModel = $appAdapter->findOneByAlias($strAlias))) {
+        if (null !== ($apiAppModel = $appAdapter->findOneByKey($strKey))) {
             if (null !== ($resConfig = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType))) {
                 if (null === ($resource = $this->resources[$resConfig['type']])) {
                     throw new \Exception(sprintf('Resource "%s" not found.', $resConfig['type']));
