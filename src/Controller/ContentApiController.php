@@ -31,10 +31,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ContentApiController extends AbstractController
 {
-    
-
     /**
-     * @Route("/show/{strKey}", name="markocupic_contao_content_api_show")
+     * @Route("/{strKey}/show", name="markocupic_contao_content_api_show")
      */
     public function showAction(string $strKey, Request $request): Response
     {
