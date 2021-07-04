@@ -1,49 +1,50 @@
 {
-    "name": "markocupic/contao-content-api",
-    "description": "Contao Content Api",
-    "keywords": [
-        "contao",
-        "content api"
+  "name": "markocupic/contao-content-api",
+  "description": "Contao Content Api",
+  "keywords": [
+    "contao",
+    "content api"
+  ],
+  "type": "contao-bundle",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Marko Cupic",
+      "email": "m.cupic@gmx.ch",
+      "homepage": "https://github.com/markocupic/contao-content-api",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/markocupic/contao-content-api/issues",
+    "source": "https://github.com/markocupic/contao-content-api"
+  },
+  "require": {
+    "contao/core-bundle": "^4.9"
+  },
+  "require-dev": {
+    "contao/easy-coding-standard": "^3.0",
+    "contao/test-case": "^4.0",
+    "contao/manager-plugin": "^2.3",
+    "phpunit/phpunit": "^8.4",
+    "symfony/http-client": "4.4.*",
+    "symfony/phpunit-bridge": "4.4.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Markocupic\\ContaoContentApi\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao"
     ],
-    "type": "contao-bundle",
-    "license": "GPL-3.0-or-later",
-    "authors": [
-        {
-            "name": "Marko Cupic",
-            "email": "m.cupic@gmx.ch",
-            "homepage": "https://github.com/markocupic/contao-content-api",
-            "role": "Developer"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/markocupic/contao-content-api/issues",
-        "source": "https://github.com/markocupic/contao-content-api"
-    },
-    "require": {
-        "contao/core-bundle": "^4.9"
-    },
-    "require-dev": {
-        "contao/manager-plugin": "^2.3",
-        "contao/test-case": "^4.0",
-        "phpunit/phpunit": "^8.4",
-        "symfony/http-client": "4.4.*",
-        "symfony/phpunit-bridge": "4.4.*",
-        "contao/easy-coding-standard": "^3.0",
-        "evert/phpdoc-md": "~0.2.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Markocupic\\ContaoContentApi\\": "src/"
-        },
-        "classmap": [
-            "src/Resources/contao"
-        ],
-        "exclude-from-classmap": [
-            "src/Resources/contao/config"
-        ]
-    },
-    "extra": {
-        "contao-manager-plugin": "Markocupic\\ContaoContentApi\\ContaoManager\\Plugin"
-    },
-    "version": "1.0.0"
+    "exclude-from-classmap": [
+      "src/Resources/contao/config",
+      "src/Resources/contao/dca",
+      "src/Resources/contao/languages"
+    ]
+  },
+  "extra": {
+    "contao-manager-plugin": "Markocupic\\ContaoContentApi\\ContaoManager\\Plugin"
+  },
+  "version": "1.0.0"
 }

@@ -34,67 +34,67 @@ Once installed, the following routes are available:
 
 Gets the sitemap including the root pages.
 
-[Example](examples/sitemap.json)
+[Example](docs/examples/sitemap.json)
 
 ##### /_mc_cc_api/sitemap/flat
 
 Gets all pages as key value pairings where the key is the URL.
 
-[Example](examples/sitemap_flat.json)
+[Example](docs/examples/sitemap_flat.json)
 
 ##### /_mc_cc_api/urls[?file=sitemap]
 
 Gets all URLs from the generated sitemap XML(s). If you define a `file`, only that XML will be parsed.
 
-[Example](examples/urls.json)
+[Example](docs/examples/urls.json)
 
 ##### /_mc_cc_api/page?url=/about/team.html
 
 Gets the page, including all articles and contents at the `url`.
 
-[Example](examples/page.json)
+[Example](docs/examples/page.json)
 
 ##### /_mc_cc_api/newsreader?url=/news/detail/new-website.html
 
 Gets the news reader content from the `url`
 
-[Example](examples/newsreader.json)
+[Example](docs/examples/newsreader.json)
 
 ##### /_mc_cc_api/?url=/page/or/newsarticle.html
 
 Tries to get the page at the `url`, and contents from any reader
 
-[Example](examples/page_newsreader.json)
+[Example](docs/examples/page_newsreader.json)
 
 ##### /_mc_cc_api/user
 
 Gets the logged-in frontend user, if available.
 
-[Example](examples/user.json)
+[Example](docs/examples/user.json)
 
 ##### /_mc_cc_api/content_element/{id}
 
 Gets the content of a content element by id.
 
-[Example](examples/content_element.json)
+[Example](docs/examples/content_element.json)
 
 ##### /_mc_cc_api/module/{id}
 
 Gets the content of a module by id.
 
-[Example](examples/module.json)
+[Example](docs/examples/module.json)
 
 ##### /_mc_cc_api/text?file=tl_news,modules
 
 Gets the content of a language file by filename(s)
 
-[Example](examples/text.json)
+[Example](docs/examples/text.json)
 
 ##### /_mc_cc_api/file?path=files/uploads&depth=2
 
 Gets the file or directory at `path` and also it's children, limited by `depth`
 
-[Example](examples/file.json)
+[Example](docs/examples/file.json)
 
 All routes also take the additional `lang` or `_locale` parameter (e.g. `?lang=de` or `?_locale=de`). If you
 need to override the language.
