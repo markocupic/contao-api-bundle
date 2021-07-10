@@ -88,7 +88,8 @@ $GLOBALS['TL_DCA']['tl_api_app'] = array(
 		'__selector__'                   => array('mProtect'),
 		'default'                        => '{first_legend},title,resourceType',
 		'contao_frontend_module'         => '{first_legend},title,resourceType;{resource_settings},allowedModules;{security_settings},key,mProtect',
-		'contao_logged_in_frontend_user' => '{first_legend},title,resourceType;{resource_settings};{security_settings},key',
+        'contao_content_element'         => '{first_legend},title,resourceType;{resource_settings},allowedContentElements;{security_settings},key,mProtect',
+        'contao_logged_in_frontend_user' => '{first_legend},title,resourceType;{resource_settings};{security_settings},key',
 	),
 
 	// Subpalettes
@@ -133,6 +134,15 @@ $GLOBALS['TL_DCA']['tl_api_app'] = array(
 			'eval'             => array('includeBlankOption' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'w50'),
 			'sql'              => "blob NULL",
 		),
+        'allowedContentElements' => array(
+            'inputType'        => 'text',
+            'exclude'          => true,
+            'search'           => true,
+            'filter'           => true,
+            'sorting'          => true,
+            'eval'             => array('tl_class' => 'w50'),
+            'sql'              => "varchar(255) NOT NULL default ''",
+        ),
 		'key'            => array(
 			'search'        => true,
 			'inputType'     => 'text',

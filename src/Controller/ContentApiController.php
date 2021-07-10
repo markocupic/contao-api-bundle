@@ -55,7 +55,7 @@ class ContentApiController extends AbstractController
             return $this->json(['message' => sprintf('Could not find any service that match to %s key.', $strKey)]);
         }
 
-        return new ContentApiResponse($resource->show($strKey, $user));
+        return new ContentApiResponse($resource->get($strKey, $user));
     }
 
     /**

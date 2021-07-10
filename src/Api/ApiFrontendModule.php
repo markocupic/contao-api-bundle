@@ -28,14 +28,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Class ApiFrontendModule.
  */
-class ApiFrontendModule implements ApiInterface
+class ApiFrontendModule extends AbstractApi
 {
-
-    /**
-     * @var ModuleModel|null
-     */
-    public $model;
-
     /**
      * @var ContaoFramework
      */
@@ -51,6 +45,11 @@ class ApiFrontendModule implements ApiInterface
      */
     private $apiUtil;
 
+    /**
+     * @var string
+     */
+    private $strModuleClass;
+
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, ApiUtil $apiUtil)
     {
         $this->framework = $framework;
@@ -58,55 +57,69 @@ class ApiFrontendModule implements ApiInterface
         $this->apiUtil = $apiUtil;
     }
 
-    public function show($strKey, ?FrontendUser $user): self
+    public function getFromId(int $id): ApiInterface
+    {
+        if (null === ($this->model = ModuleModel::findByPk($id))) {
+            return $this->returnError(sprintf('Not entity found for ID %s.', $id));
+        }
+
+        /** @var Module $moduleAdapter */
+        $moduleAdapter = $this->framework->getAdapter(Module::class);
+        $this->strModuleClass = $moduleAdapter->findClass($this->model->type);
+
+        try {
+            $strColumn = null;
+
+            // Add compatibility to new front end module fragments
+            if (ModuleProxy::class === $this->strModuleClass) {
+                $strColumn = 'main';
+            }
+
+            // Clean module object
+            $module = new $this->strModuleClass($this->model, $strColumn);
+            $arrData = [
+                'id' => $id,
+                'type' => $this->model->type,
+                'compiledHTML' => @$module->generate() ?? null,
+            ];
+            $this->model->setRow($arrData);
+        } catch (\Exception $e) {
+            return $this->returnError('Compiling error.');
+        }
+
+        $this->triggerApiModuleGeneratedHook();
+
+        return $this;
+    }
+
+    public function get($strKey, ?FrontendUser $user): ApiInterface
     {
         /** @var ApiAppModel $apiAppModel */
         $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
-        $apiAppModel = $appAdapter->findOneByKey($strKey);
+
+        if (null === ($apiAppModel = $appAdapter->findOneByKey($strKey))) {
+            return $this->returnError('No Api App entity found.');
+        }
+
+        $resConfig = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType);
 
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->has('id')) {
-            $id = $request->query->get('id');
-
-            // Get config data from current resource defined in config.yml
-            $configData = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType);
-
-            if (null !== ($this->model = $configData['modelClass']::findByPk($id))) {
-                if (null !== $apiAppModel) {
-                    if (!$this->isAllowed($apiAppModel, (int) $id)) {
-                        $this->model->message = 'Access to this resource is not allowed!';
-                        $this->model->compiledHTML = null;
-                    } else {
-                        /** @var Module $moduleAdapter */
-                        $moduleAdapter = $this->framework->getAdapter(Module::class);
-                        $moduleClass = $moduleAdapter->findClass($this->model->type);
-
-                        try {
-                            $strColumn = null;
-
-                            // Add compatibility to new front end module fragments
-                            if (ModuleProxy::class === $moduleClass) {
-                                $strColumn = 'main';
-                            }
-
-                            $module = new $moduleClass($this->model, $strColumn);
-                            $this->model->compiledHTML = @$module->generate() ?? null;
-                        } catch (\Exception $e) {
-                            $this->model->compiledHTML = null;
-                        }
-                    }
-                }
-            }
+        if (!$request->query->has('id')) {
+            return $this->returnError('No id detected in the request query.');
         }
 
-        if (isset($GLOBALS['TL_HOOKS']['apiModuleGenerated']) && \is_array($GLOBALS['TL_HOOKS']['apiModuleGenerated'])) {
-            foreach ($GLOBALS['TL_HOOKS']['apiModuleGenerated'] as $callback) {
-                $callback[0]::{$callback[1]}($this, $moduleClass);
-            }
+        $id = (int) $request->query->get('id');
+
+        if (!$this->isAllowed($apiAppModel, $id)) {
+            return $this->returnError(sprintf('Access to resource with ID %s denied.', $id));
         }
 
-        return $this;
+        if (null === ($this->model = $resConfig['modelClass']::findByPk($id))) {
+            return $this->returnError(sprintf('Not entity found for ID %s.', $id));
+        }
+
+        return $this->getFromId($id);
     }
 
     public function isAllowed(ApiAppModel $apiAppModel, int $id): bool
@@ -124,5 +137,14 @@ class ApiFrontendModule implements ApiInterface
         }
 
         return new ContaoJson($this->model);
+    }
+
+    private function triggerApiModuleGeneratedHook(): void
+    {
+        if (isset($GLOBALS['TL_HOOKS']['apiModuleGenerated']) && \is_array($GLOBALS['TL_HOOKS']['apiModuleGenerated'])) {
+            foreach ($GLOBALS['TL_HOOKS']['apiModuleGenerated'] as $callback) {
+                $callback[0]::{$callback[1]}($this, $this->strModuleClass);
+            }
+        }
     }
 }

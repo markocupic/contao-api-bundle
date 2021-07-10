@@ -24,7 +24,7 @@ use Markocupic\ContaoContentApi\Model\ApiAppModel;
  * ApiLoggedInFrontendUser::toJson() will output the frontend user (member) that is currently logged in.
  * Will return 'null' in case of error.
  */
-class ApiLoggedInFrontendUser implements ApiInterface
+class ApiLoggedInFrontendUser
 {
     /**
      * @var ContaoFramework
@@ -41,9 +41,18 @@ class ApiLoggedInFrontendUser implements ApiInterface
         $this->framework = $framework;
     }
 
-    public function show($strKey, $user): self
+    public function get(string $strKey, ?FrontendUser $user): self
     {
-        $this->user = $user;
+        $id = (int) $this->user->id;
+
+        return $this->getFromId($id);
+    }
+
+    public function getFromId(int $id): self
+    {
+        if ((int) $this->user->id !== $id) {
+            throw new Exception('Access to this user denied.');
+        }
 
         return $this;
     }

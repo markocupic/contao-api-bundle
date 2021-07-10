@@ -17,43 +17,86 @@ namespace Markocupic\ContaoContentApi\Api;
 use Contao\ContentElement;
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FormFieldModel;
 use Contao\FormModel;
-use Markocupic\ContaoContentApi\AugmentedContaoModel;
+use Contao\FrontendUser;
+use Contao\ModuleModel;
+use Markocupic\ContaoContentApi\ContaoJson;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
+use Markocupic\ContaoContentApi\Util\ApiUtil;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * ApiContentElement augments ContentModel for the API.
+ * Class ApiContentElement.
  */
-class ApiContentElement extends AugmentedContaoModel
+class ApiContentElement extends AbstractApi
 {
+
     /**
-     * @param int    $apiResource content model id
-     * @param string $inColumn    Column the content element resides in
+     * @var ContaoFramework
      */
-    public function __construct(ApiResource $apiResource, string $inColumn = 'main')
+    private $framework;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var ApiUtil
+     */
+    private $apiUtil;
+
+    /**
+     * @var ApiFrontendModule
+     */
+    private $apiFrontendModule;
+
+    private $subModule;
+
+    /**
+     * @var FormModel
+     */
+    private $subForm;
+
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ApiUtil $apiUtil, ApiFrontendModule $apiFrontendModule)
     {
-        //$this->model = ContentModel::findById($id, ['published'], ['1']);
+        $this->framework = $framework;
+        $this->requestStack = $requestStack;
+        $this->apiUtil = $apiUtil;
+        $this->apiFrontendModule = $apiFrontendModule;
+    }
+
+    public function getFromId(int $id): ApiInterface
+    {
+        $inColumn = 'main';
+
+        $this->model = ContentModel::findById($id, ['published'], ['1']);
 
         if (!$this->model || !Controller::isVisibleElement($this->model)) {
-            return $this->model = null;
+            $this->returnError(sprintf('Content element with ID %s not found or not published', $id));
+            return $this;
         }
 
-        $this->compiledHtml = null;
 
         $ceClass = 'Contao\Content'.ucfirst($this->model->type);
 
         if (class_exists($ceClass)) {
             try {
                 $compiled = new $ceClass($this->model, $inColumn);
-                $this->compiledHtml = $compiled->generate();
+                $this->model->compiledHTML = $compiled->generate();
             } catch (\Exception $e) {
+                $this->returnError('Compiling error.');
             }
         }
 
-        if ('module' === $this->type) {
+        if ('module' === $this->model->type) {
+            die(print_r($this->model,true));
             $contentModuleClass = ContentElement::findClass($this->type);
-            $element = new $contentModuleClass($this->model, $inColumn);
-            $this->subModule = new ApiModule((int) $element->module);
+            $element = new $contentModuleClass($this->model->module, $inColumn);
+            $this->model->compiledHTML = $this->apiFrontendModule->getFromId($this->model->module);
+            die($this->model->compiledHTML);
         }
 
         if ('form' === $this->type) {
@@ -64,6 +107,38 @@ class ApiContentElement extends AugmentedContaoModel
             }
             $this->subForm = $formModel;
         }
+
+        return $this;
+    }
+
+    public function get($strKey, ?FrontendUser $user): ApiInterface
+    {
+        /** @var ApiAppModel $apiAppModel */
+        $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
+
+        if (null === ($apiAppModel = $appAdapter->findOneByKey($strKey))) {
+            return $this->returnError('No Api App entity found.');
+        }
+
+        $resConfig = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType);
+
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request->query->has('id')) {
+            return $this->returnError('No id detected in the request query.');
+        }
+
+        $id = (int) $request->query->get('id');
+
+        if (!$this->isAllowed($apiAppModel, $id)) {
+            return $this->returnError(sprintf('Access to resource with ID %s denied.', $id));
+        }
+
+        if (null === ($this->model = $resConfig['modelClass']::findByPk($id))) {
+            return $this->returnError(sprintf('Not entity found for ID %s.', $id));
+        }
+
+        return $this->getFromId($id);
     }
 
     /**
@@ -101,5 +176,21 @@ class ApiContentElement extends AugmentedContaoModel
     public function hasReader($readerType): bool
     {
         return $this->subModule && $this->subModule->type === $readerType;
+    }
+
+    public function isAllowed(ApiAppModel $apiAppModel, int $id): bool
+    {
+        $arrAllowed = explode(',',$apiAppModel->allowedContentElements);
+
+        return \in_array($id, $arrAllowed, false);
+    }
+
+    public function toJson(): ContaoJson
+    {
+        if (!$this->model) {
+            return new ContaoJson(null);
+        }
+
+        return new ContaoJson($this->model);
     }
 }
