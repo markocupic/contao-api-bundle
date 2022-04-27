@@ -28,7 +28,7 @@ class MarkocupicContaoContentApiExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'markocupic_contao_content_api';
     }
