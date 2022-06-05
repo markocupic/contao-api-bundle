@@ -23,7 +23,7 @@
     "contao/core-bundle": "^4.9"
   },
   "require-dev": {
-    "contao/easy-coding-standard": "^3.0",
+    "contao/easy-coding-standard": "^5.0",
     "contao/test-case": "^4.0",
     "contao/manager-plugin": "^2.3",
     "phpunit/phpunit": "^8.4",
