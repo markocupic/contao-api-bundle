@@ -48,7 +48,7 @@ class ApiFile
         }
     }
 
-    public function get(string $stringAlias, ?FrontendUser $user): self
+    public function get(string $stringAlias, FrontendUser|null $user): self
     {
         $request = $this->requestStack->getCurrentRequest();
 

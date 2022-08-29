@@ -66,7 +66,7 @@ class ContaoFrontendUser
         $this->securityHelper = $securityHelper;
     }
 
-    public function getContaoFrontendUser(): ?FrontendUser
+    public function getContaoFrontendUser(): FrontendUser|null
     {
         $this->framework->initialize();
 
@@ -98,7 +98,7 @@ class ContaoFrontendUser
         }
     }
 
-    private function getSession(): ?SessionInterface
+    private function getSession(): SessionInterface|null
     {
         $request = $this->requestStack->getCurrentRequest();
 

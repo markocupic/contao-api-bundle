@@ -61,7 +61,7 @@ class ApiResourceManager
         $this->services[$alias] = $id;
     }
 
-    public function get(string $strKey, ?FrontendUser $user): ?ApiInterface
+    public function get(string $strKey, FrontendUser|null $user): ApiInterface|null
     {
         $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
 
@@ -90,7 +90,7 @@ class ApiResourceManager
         return false;
     }
 
-    public function isUserAllowed(string $strKey, ?FrontendUser $user): bool
+    public function isUserAllowed(string $strKey, FrontendUser|null $user): bool
     {
         /** @var ApiAppModel $apiAppAdapter */
         $apiAppAdapter = $this->framework->getAdapter(ApiAppModel::class);

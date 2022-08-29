@@ -41,7 +41,7 @@ class ApiLoggedInFrontendUser
         $this->framework = $framework;
     }
 
-    public function get(string $strKey, ?FrontendUser $user): self
+    public function get(string $strKey, FrontendUser|null $user): self
     {
         $id = (int) $this->user->id;
 

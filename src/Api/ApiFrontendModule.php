@@ -92,7 +92,7 @@ class ApiFrontendModule extends AbstractApi
         return $this;
     }
 
-    public function get($strKey, ?FrontendUser $user): ApiInterface
+    public function get($strKey, FrontendUser|null $user): ApiInterface
     {
         /** @var ApiAppModel $apiAppModel */
         $appAdapter = $this->framework->getAdapter(ApiAppModel::class);

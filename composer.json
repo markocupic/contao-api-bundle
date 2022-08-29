@@ -20,7 +20,8 @@
     "source": "https://github.com/markocupic/contao-content-api"
   },
   "require": {
-    "contao/core-bundle": "^4.9"
+    "php": "^8.0",
+    "contao/core-bundle": "^4.13"
   },
   "require-dev": {
     "contao/easy-coding-standard": "^5.0",
@@ -46,5 +47,5 @@
   "extra": {
     "contao-manager-plugin": "Markocupic\\ContaoContentApi\\ContaoManager\\Plugin"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

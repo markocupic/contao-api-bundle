@@ -22,10 +22,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class ApiUtil implements FrameworkAwareInterface, ContainerAwareInterface
 {
-    use FrameworkAwareTrait;
     use ContainerAwareTrait;
+    use FrameworkAwareTrait;
 
-    public function getResourceConfigByName(string $resourceName): ?array
+    public function getResourceConfigByName(string $resourceName): array|null
     {
         $resources = System::getContainer()->getParameter('markocupic_contao_content_api');
 
