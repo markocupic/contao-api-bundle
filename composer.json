@@ -46,6 +46,5 @@
   },
   "extra": {
     "contao-manager-plugin": "Markocupic\\ContaoContentApi\\ContaoManager\\Plugin"
-  },
-  "version": "1.0.1"
+  }
 }
