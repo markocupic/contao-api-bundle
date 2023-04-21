@@ -13,6 +13,7 @@ return function (ECSConfig $ECSConfig): void {
 
         MethodChainingIndentationFixer::class => [
             '*/DependencyInjection/Configuration.php',
+
         ],
     ]);
 };

@@ -3,39 +3,17 @@ services:
         autowire: true
         autoconfigure: true
         public: true
-        #bind:
-            #$projectDir: '%kernel.project_dir%'
-
-    _instanceof:
-        Symfony\Bundle\FrameworkBundle\Controller\AbstractController:
-            calls:
-                - [ setContainer, [ '@service_container' ] ]
-
+        bind:
+            $contaoContentApiConfig: '%markocupic_contao_content_api%'
 
     Markocupic\ContaoContentApi\:
         resource: ../../
         exclude: ../../{DependencyInjection,Resources,Model,Api}
 
-    markocupic_contao_content_api.backend.api_app:
-        class: Markocupic\ContaoContentApi\Backend\TlApiApp
-
-    markocupic_contao_content_api.controller.content_api:
-        class: Markocupic\ContaoContentApi\Controller\ContentApiController
-        calls:
-            - [setContainer, ['@service_container']]
-
-    markocupic_contao_content_api.user.contao.frontend:
-        class: Markocupic\ContaoContentApi\User\Contao\ContaoFrontenduser
-
-    markocupic_contao_content_api.manager.resource:
-        class: Markocupic\ContaoContentApi\Manager\ApiResourceManager
-
     Markocupic\ContaoContentApi\Api\ApiFrontendModule:
         public: false
         tags:
             - { name: markocupic_contao_content_api.resource, alias: contao_frontend_module }
-    markocupic_contao_content_api.resource.contao_frontend_module:
-        alias: Markocupic\ContaoContentApi\Api\ApiFrontendModule
 
     markocupic_contao_content_api.resource.contao_content_element:
         class: Markocupic\ContaoContentApi\Api\ApiContentElement

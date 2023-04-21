@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of Contao Content Api.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
- * @license GPL-3.0-or-later
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-content-api
@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\DependencyInjection\Compiler;
 
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -27,7 +28,7 @@ class ApiResourcePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $definition = $container->findDefinition('markocupic_contao_content_api.manager.resource');
+        $definition = $container->findDefinition(ApiResourceManager::class);
 
         // find all service IDs with the huh.api.resource tag
         $taggedServices = $container->findTaggedServiceIds('markocupic_contao_content_api.resource');

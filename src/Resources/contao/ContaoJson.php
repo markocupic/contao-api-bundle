@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of Contao Content Api.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
- * @license GPL-3.0-or-later
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-content-api
@@ -101,6 +101,11 @@ class ContaoJson implements \JsonSerializable
             $data = $this->handleString($data);
         }
         $this->data = $data;
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->data;
     }
 
     private function handleCollection(Collection $collection)
@@ -203,10 +208,5 @@ class ContaoJson implements \JsonSerializable
         }
 
         return $string;
-    }
-
-    public function jsonSerialize()
-    {
-        return $this->data;
     }
 }

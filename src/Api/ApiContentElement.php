@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao Content Api.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -21,7 +21,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FormFieldModel;
 use Contao\FormModel;
 use Contao\FrontendUser;
-use Contao\ModuleModel;
 use Markocupic\ContaoContentApi\ContaoJson;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Markocupic\ContaoContentApi\Util\ApiUtil;
@@ -32,7 +31,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ApiContentElement extends AbstractApi
 {
-
     /**
      * @var ContaoFramework
      */
@@ -76,9 +74,9 @@ class ApiContentElement extends AbstractApi
 
         if (!$this->model || !Controller::isVisibleElement($this->model)) {
             $this->returnError(sprintf('Content element with ID %s not found or not published', $id));
+
             return $this;
         }
-
 
         $ceClass = 'Contao\Content'.ucfirst($this->model->type);
 
@@ -92,7 +90,7 @@ class ApiContentElement extends AbstractApi
         }
 
         if ('module' === $this->model->type) {
-            die(print_r($this->model,true));
+            die(print_r($this->model, true));
             $contentModuleClass = ContentElement::findClass($this->type);
             $element = new $contentModuleClass($this->model->module, $inColumn);
             $this->model->compiledHTML = $this->apiFrontendModule->getFromId($this->model->module);
@@ -111,7 +109,7 @@ class ApiContentElement extends AbstractApi
         return $this;
     }
 
-    public function get($strKey, ?FrontendUser $user): ApiInterface
+    public function get($strKey, FrontendUser|null $user): ApiInterface
     {
         /** @var ApiAppModel $apiAppModel */
         $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
@@ -180,7 +178,7 @@ class ApiContentElement extends AbstractApi
 
     public function isAllowed(ApiAppModel $apiAppModel, int $id): bool
     {
-        $arrAllowed = explode(',',$apiAppModel->allowedContentElements);
+        $arrAllowed = explode(',', $apiAppModel->allowedContentElements);
 
         return \in_array($id, $arrAllowed, false);
     }

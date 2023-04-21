@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao Content Api.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -67,7 +67,7 @@ class ApiResourceManager
 
         if (null !== ($apiAppModel = $appAdapter->findOneByKey($strKey))) {
             if (null !== ($resConfig = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType))) {
-                if (null === ($resource = $this->resources[$resConfig['type']])) {
+                if (!isset($resConfig['type']) || null === ($resource = $this->resources[$resConfig['type']])) {
                     throw new \Exception(sprintf('Resource "%s" not found.', $resConfig['type']));
                 }
 
