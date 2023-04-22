@@ -150,5 +150,5 @@
   "userList_replacePrivateAdressWithRoleAdress":null,
   "inline":"",
   "splashImage":"",
-  "compiledHtml":"<!-- TEMPLATE START: vendor/contao/core-bundle/src/Resources/contao/templates/elements/ce_text.html5 -->\n\n<div class=\"ce_text block\">\n\n <h2>here comes the headline</h2>\n \n \n <p>Here comes the text.</p> \n \n \n\n</div>\n\n<!-- TEMPLATE END: vendor/contao/core-bundle/src/Resources/contao/templates/elements/ce_text.html5 -->"
+  "compiledHtml":"<!-- TEMPLATE START: vendor/contao/core-bundle/contao/templates/elements/ce_text.html5 -->\n\n<div class=\"ce_text block\">\n\n <h2>here comes the headline</h2>\n \n \n <p>Here comes the text.</p> \n \n \n\n</div>\n\n<!-- TEMPLATE END: vendor/contao/core-bundle/contao/templates/elements/ce_text.html5 -->"
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Manager;
 
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\StringUtil;
@@ -25,89 +26,76 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ApiResourceManager
 {
     /**
-     * @var ContaoFramework
-     */
-    private $framework;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var ApiUtil
-     */
-    private $apiUtil;
-
-    private $resources = [];
-
-    private $services = [];
-
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ApiUtil $apiUtil)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->apiUtil = $apiUtil;
-    }
-
-    /**
-     * Add a resource for given alias.
+     * Assigned via compile pass during compilation.
      *
-     * @param ResourceInterface $resource
+     * @var array <ApiInterface>
      */
-    public function add($resource, string $alias, string $id): void
-    {
-        $this->resources[$alias] = $resource;
-        $this->services[$alias] = $id;
+    private array $resources = [];
+
+    /**
+     * Assigned via compile pass during compilation.
+     *
+     * @var array <string>
+     */
+    private array $services = [];
+
+    private readonly Adapter $stringUtil;
+    private readonly Adapter $apiAppModel;
+
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly ApiUtil $apiUtil,
+    ) {
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
     }
 
-    public function get(string $strKey, FrontendUser|null $user): ApiInterface|null
+    public function add(ApiInterface $apiResource, string $alias, string $serviceId): void
     {
-        $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
+        $this->resources[$alias] = $apiResource;
+        $this->services[$alias] = $serviceId;
+    }
 
-        if (null !== ($apiAppModel = $appAdapter->findOneByKey($strKey))) {
-            if (null !== ($resConfig = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType))) {
-                if (!isset($resConfig['type']) || null === ($resource = $this->resources[$resConfig['type']])) {
-                    throw new \Exception(sprintf('Resource "%s" not found.', $resConfig['type']));
-                }
+    public function get(string $strKey): ApiInterface|null
+    {
+        $model = $this->apiAppModel->findOneByKey($strKey);
 
-                return $resource;
-            }
+        if (null === $model) {
+            throw new \Exception(sprintf('Could not find a assigned API configuration for the key "%s" Please check the API configuration in the Contao Backend.', $strKey));
         }
 
-        return null;
+        $resConfig = $this->apiUtil->getResourceConfigByName($model->resourceType);
+
+        if (null === $resConfig) {
+            throw new \Exception(sprintf('Could not find an API configuration for the resource type "%s".', $model->resourceType));
+        }
+
+        return $this->resources[$resConfig['type']];
     }
 
     public function hasValidKey(string $strKey): bool
     {
-        $adapter = $this->framework->getAdapter(ApiAppModel::class);
-        $apiAppModel = $adapter->findOneByKey($strKey);
+        $model = $this->apiAppModel->findOneByKey($strKey);
 
-        if (null !== $apiAppModel) {
-            return true;
-        }
-
-        return false;
+        return null !== $model;
     }
 
     public function isUserAllowed(string $strKey, FrontendUser|null $user): bool
     {
-        /** @var ApiAppModel $apiAppAdapter */
-        $apiAppAdapter = $this->framework->getAdapter(ApiAppModel::class);
-
-        if (null === $apiAppModel = $apiAppAdapter->findOneByKey($strKey)) {
+        if (null === ($model = $this->apiAppModel->findOneByKey($strKey))) {
             return false;
         }
 
-        if ($apiAppModel->mProtect) {
+        if ($model->mProtect) {
             if (!$user) {
                 return false;
             }
 
-            $arrMemberGroups = StringUtil::deserialize($user->groups, true);
-            $arrAppGroups = StringUtil::deserialize($apiAppModel->mGroups, true);
+            $memberGroups = $this->stringUtil->deserialize($user->groups, true);
+            $allowedGroups = $this->stringUtil->deserialize($model->mGroups, true);
 
-            return array_intersect($arrAppGroups, $arrMemberGroups) ? true : false;
+            return (bool) array_intersect($allowedGroups, $memberGroups);
         }
 
         return true;

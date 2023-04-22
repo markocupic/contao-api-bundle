@@ -7,7 +7,7 @@
 
     let vueElement = document.getElementById('apiContentElement');
     let elId = vueElement.getAttribute('data-contao-ce');
-    let url = '/_mc_cc_api/09ac601ffa0bab8ed8522bf70e45b39a/show?id=' + elId + '&_locale=de';
+    let url = '/_mc_cc_api/09ac601ffa0bab8ed8522bf70e45b39a/show/' + elId + '?locale=de';
 
     // Instantiate vue.js application
     new Vue({

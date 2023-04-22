@@ -14,16 +14,18 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi;
 
-use Markocupic\ContaoContentApi\DependencyInjection\Compiler\ApiResourcePass;
+use Markocupic\ContaoContentApi\DependencyInjection\Compiler\TaggedApiResourcePass;
 use Markocupic\ContaoContentApi\DependencyInjection\MarkocupicContaoContentApiExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Class MarkocupicContaoContentApi.
- */
 class MarkocupicContaoContentApi extends Bundle
 {
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
+    }
+
     public function getContainerExtension(): MarkocupicContaoContentApiExtension
     {
         return new MarkocupicContaoContentApiExtension();
@@ -34,6 +36,6 @@ class MarkocupicContaoContentApi extends Bundle
      */
     public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new ApiResourcePass());
+        $container->addCompilerPass(new TaggedApiResourcePass());
     }
 }

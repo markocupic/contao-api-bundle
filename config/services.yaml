@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+        bind:
+            $contaoContentApiEnabled: '%markocupic_contao_content_api.enabled%'
+            $contaoContentApiResources: '%markocupic_contao_content_api.resources%'
+
+
+    Markocupic\ContaoContentApi\:
+        resource: ../src/
+        exclude: ../src/{DependencyInjection,Response,Model,Json}

@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-content-api
  */
 
-namespace Markocupic\ContaoContentApi;
+namespace Markocupic\ContaoContentApi\Json;
 
 use Contao\Controller;
 use Contao\File;
@@ -41,16 +41,10 @@ use Markocupic\ContaoContentApi\Api\ApiInterface;
  */
 class ContaoJson implements \JsonSerializable
 {
-    public $data;
-    private $allowedFields;
+    public mixed $data;
+    private array|null $allowedFields;
 
-    /**
-     * constructor.
-     *
-     * @param mixed $data          any data you want resolved and serialized
-     * @param array $allowedFields an array of whitelisted keys (non-matching values will be purged)
-     */
-    public function __construct($data, array $allowedFields = null)
+    public function __construct(mixed $data, array $allowedFields = null)
     {
         $this->allowedFields = $allowedFields;
         $doHandle = true;
@@ -66,7 +60,7 @@ class ContaoJson implements \JsonSerializable
         }
 
         if ($data instanceof ApiInterface) {
-            $data = $data->toJson();
+            $data = new self($data->getResponseData()->getAll());
         }
 
         if ($data instanceof self) {

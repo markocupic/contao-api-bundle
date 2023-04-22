@@ -31,13 +31,13 @@ abstract class AbstractApiController extends AbstractController
         protected readonly ScopeMatcher $scopeMatcher,
         protected readonly Security $security,
         protected readonly ApiResourceManager $apiResourceManager,
-        protected readonly array $contaoContentApiConfig,
+        protected readonly bool $contaoContentApiEnabled,
     ) {
     }
 
     protected function initialize(): void
     {
-        if (!$this->contaoContentApiConfig['enabled']) {
+        if (!$this->contaoContentApiEnabled) {
             $response = new Response('Content API is disabled!');
 
             throw new ResponseException($response);

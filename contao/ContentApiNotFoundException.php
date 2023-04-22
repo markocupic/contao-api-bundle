@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Exceptions;
 
-use Markocupic\ContaoContentApi\ContaoJson;
 use Markocupic\ContaoContentApi\ContaoJsonSerializable;
+use Markocupic\ContaoContentApi\Json\ContaoJson;
 
 /**
  * ContentApiNotFoundException is thrown whenever something is simply not there.
  * It indicates an Error 404.
  */
-class ContentApiNotFoundException extends \Exception implements ContaoJsonSerializable
+class ContentApiNotFoundException extends \Exception
 {
     public function toJson(): ContaoJson
     {

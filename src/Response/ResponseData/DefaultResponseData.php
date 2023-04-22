@@ -12,11 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-content-api
  */
 
-namespace Markocupic\ContaoContentApi\Model;
+namespace Markocupic\ContaoContentApi\Response\ResponseData;
 
-use Contao\Model;
-
-class ApiAppModel extends Model
+class DefaultResponseData extends AbstractResponseData
 {
-    protected static $strTable = 'tl_api_app';
 }

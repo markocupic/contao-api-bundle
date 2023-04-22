@@ -15,19 +15,21 @@ declare(strict_types=1);
 namespace Markocupic\ContaoContentApi\Api;
 
 use Contao\FrontendUser;
-use Markocupic\ContaoContentApi\ContaoJson;
+use Markocupic\ContaoContentApi\Json\ContaoJson;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
+use Markocupic\ContaoContentApi\Response\ResponseData\ResponseDataInterface;
 
-/**
- * Interface ApiInterface.
- */
 interface ApiInterface
 {
     public function toJson(): ContaoJson;
 
     public function isAllowed(ApiAppModel $apiModel, int $id): bool;
 
-    public function get(string $stringAlias, FrontendUser|null $user): self;
+    public function get(string $stringAlias, int $id, FrontendUser|null $user): self;
 
     public function getFromId(int $id): self;
+
+    public function initializeResponseData(ResponseDataInterface $responseData): void;
+
+    public function getResponseData(): ResponseDataInterface|null;
 }

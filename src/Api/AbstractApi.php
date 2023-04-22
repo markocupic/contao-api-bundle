@@ -14,20 +14,30 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Api;
 
-use Contao\Model;
+use Markocupic\ContaoContentApi\Response\ResponseData\ResponseDataInterface;
 
 abstract class AbstractApi implements ApiInterface
 {
-    /**
-     * @var Model
-     */
-    protected $model;
+    protected ResponseDataInterface|null $responseData;
+
+    public function initializeResponseData(ResponseDataInterface $responseData): void
+    {
+        $this->responseData = $responseData;
+    }
+
+    public function getResponseData(): ResponseDataInterface|null
+    {
+        return $this->responseData;
+    }
 
     protected function returnError(string $error): ApiInterface
     {
-        $this->model = new \stdClass();
-        $this->model->message = $error;
-        $this->model->compiledHTML = null;
+        $this->responseData->setRow(
+            [
+                'message' => $error,
+                'compiledHTML' => null,
+            ]
+        );
 
         return $this;
     }

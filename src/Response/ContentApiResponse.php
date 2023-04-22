@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-content-api
  */
 
-namespace Markocupic\ContaoContentApi;
+namespace Markocupic\ContaoContentApi\Response;
 
 use Markocupic\ContaoContentApi\Api\ApiInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;

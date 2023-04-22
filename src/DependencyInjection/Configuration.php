@@ -19,9 +19,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    public const ROOT_KEY = 'markocupic_contao_content_api';
+
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('markocupic_contao_content_api');
+        $treeBuilder = new TreeBuilder(self::ROOT_KEY);
 
         $treeBuilder->getRootNode()
             ->children()
@@ -31,8 +33,8 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('name')->cannotBeEmpty()->end()
                             ->scalarNode('type')->cannotBeEmpty()->end()
-                            ->scalarNode('modelClass')->cannotBeEmpty()->end()
-                            ->scalarNode('verboseName')->cannotBeEmpty()->end()
+                            ->scalarNode('model_class')->cannotBeEmpty()->end()
+                            ->scalarNode('verbose_name')->cannotBeEmpty()->end()
                         ->end()
                     ->end()
                 ->end()

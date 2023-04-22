@@ -14,109 +14,88 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Api;
 
+use Contao\Controller;
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\Module;
 use Contao\ModuleModel;
-use Contao\ModuleProxy;
 use Contao\StringUtil;
-use Markocupic\ContaoContentApi\ContaoJson;
+use Markocupic\ContaoContentApi\Json\ContaoJson;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
+use Markocupic\ContaoContentApi\Response\ResponseData\DefaultResponseData;
 use Markocupic\ContaoContentApi\Util\ApiUtil;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class ApiFrontendModule.
- */
+#[AutoconfigureTag('markocupic_contao_content_api.resource', ['name' => self::NAME, 'type' => self::TYPE, 'model_class' => self::MODEL_CLASS, 'verbose_name' => self::VERBOSE_NAME])]
 class ApiFrontendModule extends AbstractApi
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    public const NAME = 'contao_frontend_module';
+    public const TYPE = 'contao_frontend_module';
+    public const MODEL_CLASS = ModuleModel::class;
+    public const VERBOSE_NAME = 'Get the content of a Contao frontend module.';
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private string|null $strModuleClass = null;
 
-    /**
-     * @var ApiUtil
-     */
-    private $apiUtil;
+    // Adapters
+    private readonly Adapter $apiAppModel;
+    private readonly Adapter $stringUtil;
+    private readonly Adapter $moduleModel;
+    private readonly Adapter $module;
+    private readonly Adapter $controller;
 
-    /**
-     * @var string
-     */
-    private $strModuleClass;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly ApiUtil $apiUtil,
+    ) {
+        $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $this->moduleModel = $this->framework->getAdapter(ModuleModel::class);
+        $this->module = $this->framework->getAdapter(Module::class);
+        $this->controller = $this->framework->getAdapter(Controller::class);
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ApiUtil $apiUtil)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->apiUtil = $apiUtil;
+        $this->initializeResponseData(new DefaultResponseData());
     }
 
     public function getFromId(int $id): ApiInterface
     {
-        if (null === ($this->model = ModuleModel::findByPk($id))) {
-            return $this->returnError(sprintf('Not entity found for ID %s.', $id));
+        if (null === ($this->model = $this->moduleModel->findByPk($id))) {
+            return $this->returnError(sprintf('No entity found for ID %s.', $id));
         }
 
-        /** @var Module $moduleAdapter */
-        $moduleAdapter = $this->framework->getAdapter(Module::class);
-        $this->strModuleClass = $moduleAdapter->findClass($this->model->type);
+        $this->strModuleClass = $this->module->findClass($this->model->type);
 
-        try {
-            $strColumn = null;
+        $content = $this->controller->getFrontendModule($id);
 
-            // Add compatibility to new front end module fragments
-            if (ModuleProxy::class === $this->strModuleClass) {
-                $strColumn = 'main';
-            }
-
-            // Clean module object
-            $module = new $this->strModuleClass($this->model, $strColumn);
-            $arrData = [
+        $this->responseData->setRow(
+            [
                 'id' => $id,
                 'type' => $this->model->type,
-                'compiledHTML' => @$module->generate() ?? null,
-            ];
-            $this->model->setRow($arrData);
-        } catch (\Exception $e) {
-            return $this->returnError('Compiling error.');
-        }
+                'compiledHTML' => false === $content ? null : $content,
+            ]
+        );
 
         $this->triggerApiModuleGeneratedHook();
 
         return $this;
     }
 
-    public function get($strKey, FrontendUser|null $user): ApiInterface
+    public function get(string $strKey, int $id, FrontendUser|null $user): ApiInterface
     {
-        /** @var ApiAppModel $apiAppModel */
-        $appAdapter = $this->framework->getAdapter(ApiAppModel::class);
-
-        if (null === ($apiAppModel = $appAdapter->findOneByKey($strKey))) {
+        if (null === ($model = $this->apiAppModel->findOneByKey($strKey))) {
             return $this->returnError('No Api App entity found.');
         }
 
-        $resConfig = $this->apiUtil->getResourceConfigByName($apiAppModel->resourceType);
+        $resConfig = $this->apiUtil->getResourceConfigByName($model->resourceType);
 
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (!$request->query->has('id')) {
-            return $this->returnError('No id detected in the request query.');
-        }
-
-        $id = (int) $request->query->get('id');
-
-        if (!$this->isAllowed($apiAppModel, $id)) {
+        if (!$this->isAllowed($model, $id)) {
             return $this->returnError(sprintf('Access to resource with ID %s denied.', $id));
         }
 
-        if (null === ($this->model = $resConfig['modelClass']::findByPk($id))) {
-            return $this->returnError(sprintf('Not entity found for ID %s.', $id));
+        if (null === ($this->model = $resConfig['model_class']::findByPk($id))) {
+            return $this->returnError(sprintf('No entity found for ID %s.', $id));
         }
 
         return $this->getFromId($id);
@@ -124,19 +103,18 @@ class ApiFrontendModule extends AbstractApi
 
     public function isAllowed(ApiAppModel $apiAppModel, int $id): bool
     {
-        $adapter = $this->framework->getAdapter(StringUtil::class);
-        $arrAllowed = $adapter->deserialize($apiAppModel->allowedModules, true);
+        $arrAllowed = $this->stringUtil->deserialize($apiAppModel->allowedModules, true);
 
         return \in_array($id, $arrAllowed, false);
     }
 
     public function toJson(): ContaoJson
     {
-        if (!$this->model) {
+        if (!$this->responseData) {
             return new ContaoJson(null);
         }
 
-        return new ContaoJson($this->model);
+        return new ContaoJson($this);
     }
 
     private function triggerApiModuleGeneratedHook(): void

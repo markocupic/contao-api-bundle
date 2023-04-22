@@ -18,7 +18,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
-use Contao\DC_Table;
 use Doctrine\DBAL\Connection;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -31,7 +30,7 @@ class ApiApp
         private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly RequestStack $requestStack,
-        private readonly array $contaoContentApiConfig,
+        private readonly array $contaoContentApiResources,
     ) {
         $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
     }
@@ -53,29 +52,16 @@ class ApiApp
         return $model->key;
     }
 
-    #[AsCallback(table: 'tl_api_app', target: 'edit.buttons', priority: 100)]
-    public function buttonsCallback(array $arrButtons, DC_Table $dc): array
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ('edit' === $request->query->get('act')) {
-            $arrButtons['customButton'] = '<button type="submit" name="customButton" id="customButton" class="tl_submit customButton" accesskey="x">'.$GLOBALS['TL_LANG']['tl_api_app']['customButton'].'</button>';
-        }
-
-        return $arrButtons;
-    }
-
     #[AsCallback(table: 'tl_api_app', target: 'fields.resourceType.options', priority: 100)]
     public function getResourceTypes(): array
     {
         $opt = [];
-        $config = $this->contaoContentApiConfig;
 
-        if (empty($config['resources'])) {
+        if (empty($this->contaoContentApiResources)) {
             throw new \Exception('No resources set in markocupic_contao_content_api');
         }
 
-        foreach ($config['resources'] as $resource) {
+        foreach ($this->contaoContentApiResources as $resource) {
             $opt[$resource['name']] = $resource['name'];
         }
 

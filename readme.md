@@ -4,8 +4,7 @@
 
 
 ## Requirements
-You'll need an up-and-running **Contao 4.9.x** installation.
-Please note that the API is **not compatible with Contao 3.x**.
+You'll need an up-and-running **Contao 4.13.x** installation.
 
 ## Installation
 Install [composer](https://getcomposer.org) if you haven't already,
@@ -19,7 +18,7 @@ Contao Content API is now installed and ready to use.
 
 Once installed, the following routes are available:
 
-##### /_mc_cc_api/{key}/show?id={moduleId}
+##### /_mc_cc_api/{key}/show/{moduleId}
 
 Gets the content of a module by id.
 

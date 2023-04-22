@@ -14,74 +14,25 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Util;
 
-use Contao\CoreBundle\Framework\FrameworkAwareInterface;
-use Contao\CoreBundle\Framework\FrameworkAwareTrait;
-use Contao\System;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
-class ApiUtil implements FrameworkAwareInterface, ContainerAwareInterface
+class ApiUtil
 {
-    use ContainerAwareTrait;
-    use FrameworkAwareTrait;
+    public function __construct(
+        private readonly array $contaoContentApiResources,
+    ) {
+    }
 
     public function getResourceConfigByName(string $resourceName): array|null
     {
-        $resources = System::getContainer()->getParameter('markocupic_contao_content_api');
+        $resources = $this->contaoContentApiResources;
 
-        if (!isset($resources['resources'])) {
+        if (empty($resources)) {
             return null;
         }
 
-        foreach ($resources['resources'] as $resource) {
+        foreach ($resources as $resource) {
             if ($resource['name'] === $resourceName) {
                 return $resource;
             }
         }
-
-        return null;
     }
-
-    /*
-     * public function getResourceConfigByModelClass(string $modelClass)
-     * {
-     * $resources = System::getContainer()->getParameter('markocupic_contao_content_api');
-     *
-     * if (!isset($resources['api']['resources'])) {
-     * return false;
-     * }
-     *
-     * foreach ($resources['api']['resources'] as $resource) {
-     * if ($resource['modelClass'] === $modelClass) {
-     * return $resource;
-     * }
-     * }
-     *
-     * return false;
-     * }
-     *
-     * public function getResourceFieldOptions(string $resourceName)
-     * {
-     * $resourceConfig = $this->container->get('huh.api.util.api_util')->getResourceConfigByName($resourceName);
-     *
-     * if (!\is_array($resourceConfig) || !class_exists($resourceConfig['modelClass'])) {
-     * return [];
-     * }
-     *
-     * return $this->container->get('huh.utils.choice.field')->getCachedChoices([
-     * 'dataContainer' => $resourceConfig['modelClass']::getTable(),
-     * ]);
-     * }
-     *
-     * public function getEntityTableByApp(ApiAppModel $app)
-     * {
-     * $config = $this->getResourceConfigByName($app->resource);
-     *
-     * if (!isset($config['modelClass']) || !class_exists($config['modelClass'])) {
-     * return false;
-     * }
-     *
-     * return $config['modelClass']::getTable();
-     * }
-     */
 }
