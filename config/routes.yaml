@@ -1,4 +1,3 @@
-# config/routes.yml
 markocupic_contao_content_api.controller:
-    resource: ../../../src/Controller
+    resource: ../src/Controller
     type: annotation
