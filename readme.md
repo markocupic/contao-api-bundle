@@ -18,7 +18,7 @@ Contao Content API is now installed and ready to use.
 
 Once installed, the following routes are available:
 
-##### /_mc_cc_api/{key}/show/{moduleId}
+##### /_mc_cc_api/{key}/content/{moduleId}
 
 Gets the content of a module by id.
 

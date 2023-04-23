@@ -48,6 +48,5 @@ class MarkocupicContaoContentApiExtension extends Extension
         $rootKey = $this->getAlias();
 
         $container->setParameter($rootKey.'.enabled', $config['enabled']);
-        $container->setParameter($rootKey.'.resources', $config['resources']);
     }
 }

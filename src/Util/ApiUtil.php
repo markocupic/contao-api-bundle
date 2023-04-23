@@ -6,7 +6,7 @@ declare(strict_types=1);
  * This file is part of Contao Content Api.
  *
  * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
- * @license GPL-3.0-or-later
+ * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-content-api
@@ -14,25 +14,30 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoContentApi\Util;
 
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
+use Markocupic\ContaoContentApi\Model\ApiAppModel;
+
 class ApiUtil
 {
+    private Adapter $apiAppModel;
+
     public function __construct(
-        private readonly array $contaoContentApiResources,
+        private readonly ContaoFramework $framework,
+        private readonly ApiResourceManager $apiResourceManager,
     ) {
+        $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
     }
 
-    public function getResourceConfigByName(string $resourceName): array|null
+    public function getApiResourceConfigurationFromApiKey(string $apiKey): array|null
     {
-        $resources = $this->contaoContentApiResources;
-
-        if (empty($resources)) {
+        if (null === ($model = $this->apiAppModel->findOneByKey($apiKey))) {
             return null;
         }
 
-        foreach ($resources as $resource) {
-            if ($resource['name'] === $resourceName) {
-                return $resource;
-            }
-        }
+        $services = $this->apiResourceManager->getServices();
+
+        return $services[$model->resourceAlias] ?? null;
     }
 }

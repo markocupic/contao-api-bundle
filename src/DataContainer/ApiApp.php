@@ -19,6 +19,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -30,7 +31,7 @@ class ApiApp
         private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly RequestStack $requestStack,
-        private readonly array $contaoContentApiResources,
+        private readonly ApiResourceManager $apiResourceManager,
     ) {
         $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
     }
@@ -55,17 +56,7 @@ class ApiApp
     #[AsCallback(table: 'tl_api_app', target: 'fields.resourceType.options', priority: 100)]
     public function getResourceTypes(): array
     {
-        $opt = [];
-
-        if (empty($this->contaoContentApiResources)) {
-            throw new \Exception('No resources set in markocupic_contao_content_api');
-        }
-
-        foreach ($this->contaoContentApiResources as $resource) {
-            $opt[$resource['name']] = $resource['name'];
-        }
-
-        return $opt;
+        return $this->apiResourceManager->getResourceTypes();
     }
 
     #[AsCallback(table: 'tl_api_app', target: 'fields.allowedModules.options', priority: 100)]
@@ -79,6 +70,18 @@ class ApiApp
         }
 
         return $opt;
+    }
+
+    #[AsCallback(table: 'tl_api_app', target: 'fields.resourceAlias.options', priority: 100)]
+    public function resourceAliases(DataContainer $dc): array
+    {
+        $resourceType = $this->connection->fetchOne('SELECT resourceType FROM tl_api_app WHERE id = ?', [$dc->id]);
+
+        if (empty($resourceType)) {
+            return [];
+        }
+
+        return $this->apiResourceManager->getResourceAliasesByType($resourceType);
     }
 
     #[AsCallback(table: 'tl_api_app', target: 'config.onload', priority: 100)]

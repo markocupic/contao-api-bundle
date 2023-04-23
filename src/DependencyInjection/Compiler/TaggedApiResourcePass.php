@@ -32,10 +32,8 @@ class TaggedApiResourcePass implements CompilerPassInterface
 
         $taggedServices = $container->findTaggedServiceIds('markocupic_contao_content_api.resource', true);
 
-        $mandatoryKeys = ['name', 'type', 'model_class', 'verbose_name'];
+        $mandatoryKeys = ['alias', 'type'];
 
-        $services = $container->getParameter('markocupic_contao_content_api.resources');
-        //$services = [];
         foreach ($taggedServices as $serviceId => $tags) {
             foreach ($mandatoryKeys as $key) {
                 if (!isset($tags[0][$key])) {
@@ -47,14 +45,13 @@ class TaggedApiResourcePass implements CompilerPassInterface
                 'add',
                 [
                     new Reference($serviceId),
-                    $tags[0]['name'],
                     $serviceId,
-                ]
+                    $tags[0]['alias'],
+                    $tags[0]['type'],
+                    $tags[0]['modelClass'],
+                    $tags[0]['verboseName'],
+                ],
             );
-
-            $services[] = $tags[0];
         }
-
-        $container->setParameter('markocupic_contao_content_api.resources', $services);
     }
 }

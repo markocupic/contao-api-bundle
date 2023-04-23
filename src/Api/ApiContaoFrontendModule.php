@@ -18,20 +18,20 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
-use Contao\Module;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 use Markocupic\ContaoContentApi\Json\ContaoJson;
+use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Markocupic\ContaoContentApi\Response\ResponseData\DefaultResponseData;
-use Markocupic\ContaoContentApi\Util\ApiUtil;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-#[AutoconfigureTag('markocupic_contao_content_api.resource', ['name' => self::NAME, 'type' => self::TYPE, 'model_class' => self::MODEL_CLASS, 'verbose_name' => self::VERBOSE_NAME])]
-class ApiFrontendModule extends AbstractApi
+#[AutoconfigureTag('markocupic_contao_content_api.resource', ['alias' => self::ALIAS, 'type' => self::TYPE, 'modelClass' => self::MODEL_CLASS, 'verboseName' => self::VERBOSE_NAME])]
+class ApiContaoFrontendModule extends AbstractApi
 {
-    public const NAME = 'contao_frontend_module';
+    public const ALIAS = 'contao_frontend_module';
     public const TYPE = 'contao_frontend_module';
     public const MODEL_CLASS = ModuleModel::class;
     public const VERBOSE_NAME = 'Get the content of a Contao frontend module.';
@@ -41,32 +41,22 @@ class ApiFrontendModule extends AbstractApi
     // Adapters
     private readonly Adapter $apiAppModel;
     private readonly Adapter $stringUtil;
-    private readonly Adapter $moduleModel;
-    private readonly Adapter $module;
     private readonly Adapter $controller;
 
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
-        private readonly ApiUtil $apiUtil,
+        private readonly ApiResourceManager $apiResourceManager,
     ) {
         $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
-        $this->moduleModel = $this->framework->getAdapter(ModuleModel::class);
-        $this->module = $this->framework->getAdapter(Module::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
 
         $this->initializeResponseData(new DefaultResponseData());
     }
 
-    public function getFromId(int $id): ApiInterface
+    public function getFromId(int $id, Request $request): ApiInterface
     {
-        if (null === ($this->model = $this->moduleModel->findByPk($id))) {
-            return $this->returnError(sprintf('No entity found for ID %s.', $id));
-        }
-
-        $this->strModuleClass = $this->module->findClass($this->model->type);
-
         $content = $this->controller->getFrontendModule($id);
 
         $this->responseData->setRow(
@@ -82,26 +72,28 @@ class ApiFrontendModule extends AbstractApi
         return $this;
     }
 
-    public function get(string $strKey, int $id, FrontendUser|null $user): ApiInterface
+    public function get(string $apiKey, int $id, Request $request, FrontendUser|null $user): ApiInterface
     {
-        if (null === ($model = $this->apiAppModel->findOneByKey($strKey))) {
-            return $this->returnError('No Api App entity found.');
+        if (null === ($model = $this->apiAppModel->findOneByKey($apiKey))) {
+            return $this->returnError(sprintf('No App configuration found for key "%s".', $apiKey));
         }
 
-        $resConfig = $this->apiUtil->getResourceConfigByName($model->resourceType);
+        if (null === ($resConfig = $this->apiResourceManager->getResourceConfigByAlias($model->resourceAlias))) {
+            return $this->returnError(sprintf('No Api found for alias "%s".', $model->resourceAlias));
+        }
 
-        if (!$this->isAllowed($model, $id)) {
+        if (!$this->isAllowed($model, $id, $request)) {
             return $this->returnError(sprintf('Access to resource with ID %s denied.', $id));
         }
 
-        if (null === ($this->model = $resConfig['model_class']::findByPk($id))) {
+        if (null === ($this->model = $resConfig['modelClass']::findByPk($id))) {
             return $this->returnError(sprintf('No entity found for ID %s.', $id));
         }
 
-        return $this->getFromId($id);
+        return $this->getFromId($id, $request);
     }
 
-    public function isAllowed(ApiAppModel $apiAppModel, int $id): bool
+    public function isAllowed(ApiAppModel $apiAppModel, int $id, Request $request): bool
     {
         $arrAllowed = $this->stringUtil->deserialize($apiAppModel->allowedModules, true);
 
@@ -121,7 +113,7 @@ class ApiFrontendModule extends AbstractApi
     {
         if (isset($GLOBALS['TL_HOOKS']['apiModuleGenerated']) && \is_array($GLOBALS['TL_HOOKS']['apiModuleGenerated'])) {
             foreach ($GLOBALS['TL_HOOKS']['apiModuleGenerated'] as $callback) {
-                $callback[0]::{$callback[1]}($this, $this->strModuleClass);
+                $callback[0]::{$callback[1]}($this);
             }
         }
     }

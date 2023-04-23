@@ -18,16 +18,17 @@ use Contao\FrontendUser;
 use Markocupic\ContaoContentApi\Json\ContaoJson;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
 use Markocupic\ContaoContentApi\Response\ResponseData\ResponseDataInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 interface ApiInterface
 {
     public function toJson(): ContaoJson;
 
-    public function isAllowed(ApiAppModel $apiModel, int $id): bool;
+    public function isAllowed(ApiAppModel $apiModel, int $id, Request $request): bool;
 
-    public function get(string $stringAlias, int $id, FrontendUser|null $user): self;
+    public function get(string $stringAlias, int $id, Request $request, FrontendUser|null $user): self;
 
-    public function getFromId(int $id): self;
+    public function getFromId(int $id, Request $request): self;
 
     public function initializeResponseData(ResponseDataInterface $responseData): void;
 

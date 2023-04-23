@@ -28,16 +28,6 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->getRootNode()
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
-                ->arrayNode('resources')
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('name')->cannotBeEmpty()->end()
-                            ->scalarNode('type')->cannotBeEmpty()->end()
-                            ->scalarNode('model_class')->cannotBeEmpty()->end()
-                            ->scalarNode('verbose_name')->cannotBeEmpty()->end()
-                        ->end()
-                    ->end()
-                ->end()
             ->end()
         ;
 

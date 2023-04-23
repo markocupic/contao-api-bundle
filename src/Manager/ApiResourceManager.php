@@ -20,23 +20,12 @@ use Contao\FrontendUser;
 use Contao\StringUtil;
 use Markocupic\ContaoContentApi\Api\ApiInterface;
 use Markocupic\ContaoContentApi\Model\ApiAppModel;
-use Markocupic\ContaoContentApi\Util\ApiUtil;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ApiResourceManager
 {
-    /**
-     * Assigned via compile pass during compilation.
-     *
-     * @var array <ApiInterface>
-     */
     private array $resources = [];
-
-    /**
-     * Assigned via compile pass during compilation.
-     *
-     * @var array <string>
-     */
     private array $services = [];
 
     private readonly Adapter $stringUtil;
@@ -45,45 +34,50 @@ class ApiResourceManager
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
-        private readonly ApiUtil $apiUtil,
     ) {
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
     }
 
-    public function add(ApiInterface $apiResource, string $alias, string $serviceId): void
+    public function add(ApiInterface $apiResource, string $serviceId, string $alias, string $type, string|null $modelClass = null, string|null $verboseName = null): void
     {
         $this->resources[$alias] = $apiResource;
-        $this->services[$alias] = $serviceId;
+        $this->services[$alias] = [
+            'serviceId' => $serviceId,
+            'alias' => $alias,
+            'type' => $type,
+            'modelClass' => $modelClass,
+            'verboseName' => $verboseName,
+        ];
     }
 
-    public function get(string $strKey): ApiInterface|null
+    public function get(string $apiKey, Request $request): ApiInterface|null
     {
-        $model = $this->apiAppModel->findOneByKey($strKey);
+        $model = $this->apiAppModel->findOneByKey($apiKey);
 
         if (null === $model) {
-            throw new \Exception(sprintf('Could not find a assigned API configuration for the key "%s" Please check the API configuration in the Contao Backend.', $strKey));
+            throw new \Exception(sprintf('Could not find an API configuration related to the key "%s". Please check your API configuration in the Contao Backend.', $apiKey));
         }
 
-        $resConfig = $this->apiUtil->getResourceConfigByName($model->resourceType);
+        $apiResource = $this->getResourceByAlias($model->resourceAlias);
 
-        if (null === $resConfig) {
-            throw new \Exception(sprintf('Could not find an API configuration for the resource type "%s".', $model->resourceType));
+        if (null === $apiResource) {
+            throw new \Exception(sprintf('Could not find an API resource for the resource alias "%s".', $model->resourceAlias));
         }
 
-        return $this->resources[$resConfig['type']];
+        return $apiResource;
     }
 
-    public function hasValidKey(string $strKey): bool
+    public function hasValidKey(string $apiKey, Request $request): bool
     {
-        $model = $this->apiAppModel->findOneByKey($strKey);
+        $model = $this->apiAppModel->findOneByKey($apiKey);
 
         return null !== $model;
     }
 
-    public function isUserAllowed(string $strKey, FrontendUser|null $user): bool
+    public function isUserAllowed(string $apiKey, Request $request, FrontendUser|null $user): bool
     {
-        if (null === ($model = $this->apiAppModel->findOneByKey($strKey))) {
+        if (null === ($model = $this->apiAppModel->findOneByKey($apiKey))) {
             return false;
         }
 
@@ -99,5 +93,49 @@ class ApiResourceManager
         }
 
         return true;
+    }
+
+    public function getResourceByAlias(string $alias): ApiInterface|null
+    {
+        return $this->resources[$alias] ?? null;
+    }
+
+    public function getResourceConfigByAlias(string $alias): array|null
+    {
+        return $this->services[$alias] ?? null;
+    }
+
+    public function getResourceTypes(): array
+    {
+        $types = [];
+
+        foreach ($this->services as $arrProp) {
+            $types[] = $arrProp['type'];
+        }
+
+        return array_filter(array_unique($types));
+    }
+
+    public function getResourceAliasesByType(string $type): array
+    {
+        $aliases = [];
+
+        foreach ($this->services as $arrProp) {
+            if ($arrProp['type'] === $type) {
+                $aliases[] = $arrProp['alias'];
+            }
+        }
+
+        return array_filter(array_unique($aliases));
+    }
+
+    public function getServices(): array
+    {
+        return $this->services;
+    }
+
+    public function getResources(): array
+    {
+        return $this->resources;
     }
 }
