@@ -11,7 +11,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="contao-content-api>">
+        <testsuite name="contao-api-bundle>">
             <directory>./tests</directory>
         </testsuite>
     </testsuites>

@@ -6,5 +6,5 @@ cd..
 cd..
 cd..
 cd..
-vendor\bin\ecs check vendor/markocupic/contao-content-api/src --config vendor/markocupic/contao-content-api/.ecs/config/default.php
-cd vendor/markocupic/contao-content-api/.ecs./batch/check
+vendor\bin\ecs check vendor/markocupic/contao-api-bundle/src --config vendor/markocupic/contao-api-bundle/.ecs/config/default.php
+cd vendor/markocupic/contao-api-bundle/.ecs./batch/check

@@ -9,15 +9,15 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocuic\ContaoContentApi;
+namespace Markocuic\ContaoApiBundle;
 
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Markocupic\ContaoContentApi\Api\ApiContaoEntity;
-use Markocupic\ContaoContentApi\Api\ApiContaoFrontendModule;
+use Markocupic\ContaoApiBundle\Api\ApiContaoEntity;
+use Markocupic\ContaoApiBundle\Api\ApiContaoFrontendModule;
 
 $GLOBALS['TL_DCA']['tl_api_app'] = [
     'config'      => [

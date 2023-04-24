@@ -9,12 +9,12 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Response;
+namespace Markocupic\ContaoApiBundle\Response;
 
-use Markocupic\ContaoContentApi\Api\ApiInterface;
+use Markocupic\ContaoApiBundle\Api\ApiInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**

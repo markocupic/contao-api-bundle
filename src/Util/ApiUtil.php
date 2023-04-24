@@ -9,15 +9,15 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Util;
+namespace Markocupic\ContaoApiBundle\Util;
 
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
-use Markocupic\ContaoContentApi\Model\ApiAppModel;
+use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
+use Markocupic\ContaoApiBundle\Model\ApiAppModel;
 
 class ApiUtil
 {

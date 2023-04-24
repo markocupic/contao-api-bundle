@@ -9,17 +9,17 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Controller;
+namespace Markocupic\ContaoApiBundle\Controller;
 
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\System;
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
+use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,14 +35,14 @@ abstract class AbstractApiController extends AbstractController
         protected readonly ScopeMatcher $scopeMatcher,
         protected readonly Security $security,
         protected readonly ApiResourceManager $apiResourceManager,
-        protected readonly bool $contaoContentApiEnabled,
+        protected readonly bool $contaoApiEnabled,
     ) {
         $this->system = $this->framework->getAdapter(System::class);
     }
 
     protected function initialize(): void
     {
-        if (!$this->contaoContentApiEnabled) {
+        if (!$this->contaoApiEnabled) {
             $response = new Response('Content API is disabled!');
 
             throw new ResponseException($response);

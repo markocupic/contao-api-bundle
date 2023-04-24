@@ -1,9 +1,9 @@
 {
-    "name": "markocupic/contao-content-api",
+    "name": "markocupic/contao-api-bundle",
     "description": "Contao Content Api",
     "keywords": [
         "contao",
-        "content api"
+        "api"
     ],
     "type": "contao-bundle",
     "license": "GPL-3.0-or-later",
@@ -11,13 +11,13 @@
         {
             "name": "Marko Cupic",
             "email": "m.cupic@gmx.ch",
-            "homepage": "https://github.com/markocupic/contao-content-api",
+            "homepage": "https://github.com/markocupic/contao-api-bundle",
             "role": "Developer"
         }
     ],
     "support": {
-        "issues": "https://github.com/markocupic/contao-content-api/issues",
-        "source": "https://github.com/markocupic/contao-content-api"
+        "issues": "https://github.com/markocupic/contao-api-bundle/issues",
+        "source": "https://github.com/markocupic/contao-api-bundle"
     },
     "require": {
         "php": "^8.1",
@@ -33,10 +33,10 @@
     },
     "autoload": {
         "psr-4": {
-            "Markocupic\\ContaoContentApi\\": "src/"
+            "Markocupic\\ContaoApiBundle\\": "src/"
         }
     },
     "extra": {
-        "contao-manager-plugin": "Markocupic\\ContaoContentApi\\ContaoManager\\Plugin"
+        "contao-manager-plugin": "Markocupic\\ContaoApiBundle\\ContaoManager\\Plugin"
     }
 }

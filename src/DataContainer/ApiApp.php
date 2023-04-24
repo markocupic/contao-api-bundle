@@ -9,18 +9,18 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\DataContainer;
+namespace Markocupic\ContaoApiBundle\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
-use Markocupic\ContaoContentApi\Model\ApiAppModel;
+use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
+use Markocupic\ContaoApiBundle\Model\ApiAppModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ApiApp

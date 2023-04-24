@@ -9,17 +9,17 @@ declare(strict_types=1);
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Manager;
+namespace Markocupic\ContaoApiBundle\Manager;
 
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\StringUtil;
-use Markocupic\ContaoContentApi\Api\ApiInterface;
-use Markocupic\ContaoContentApi\Model\ApiAppModel;
+use Markocupic\ContaoApiBundle\Api\ApiInterface;
+use Markocupic\ContaoApiBundle\Model\ApiAppModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

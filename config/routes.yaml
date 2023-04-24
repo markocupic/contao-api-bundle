@@ -1,3 +1,3 @@
-markocupic_contao_content_api.controller:
+markocupic_contao_api.controller:
     resource: ../src/Controller
     type: annotation

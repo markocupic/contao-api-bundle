@@ -9,15 +9,15 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Api;
+namespace Markocupic\ContaoApiBundle\Api;
 
 use Contao\MemberModel;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('markocupic_contao_content_api.resource', ['alias' => self::ALIAS, 'type' => self::TYPE, 'modelClass' => self::MODEL_CLASS, 'verboseName' => self::VERBOSE_NAME])]
+#[AutoconfigureTag('markocupic_contao_api.resource', ['alias' => self::ALIAS, 'type' => self::TYPE, 'modelClass' => self::MODEL_CLASS, 'verboseName' => self::VERBOSE_NAME])]
 class ApiMemberEntity extends AbstractApiEntityResource
 {
     public const ALIAS = 'member';

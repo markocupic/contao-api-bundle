@@ -9,10 +9,10 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Json;
+namespace Markocupic\ContaoApiBundle\Json;
 
 use Contao\Controller;
 use Contao\File;
@@ -21,7 +21,7 @@ use Contao\Model;
 use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
-use Markocupic\ContaoContentApi\Api\ApiInterface;
+use Markocupic\ContaoApiBundle\Api\ApiInterface;
 
 /**
  * ContaoJson tries to pack "everything Contao" into a JSON-serializable package.
@@ -149,7 +149,7 @@ class ContaoJson implements \JsonSerializable
                     //$data->{$key} = (new File($src, $object->size ?? null))->toJson();
                 }
             } elseif ('author' === $key && is_numeric($value)) {
-                $author = System::getContainer()->get('markocupic_contao_content_api.resource.author');
+                $author = System::getContainer()->get('markocupic_contao_api.resource.author');
                 $data->{$key} = $author->getFromId((int) $value)->toJson();
             } else {
                 $data->{$key} = new self($value);

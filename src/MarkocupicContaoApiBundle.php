@@ -9,26 +9,26 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi;
+namespace Markocupic\ContaoApiBundle;
 
-use Markocupic\ContaoContentApi\DependencyInjection\Compiler\TaggedApiResourcePass;
-use Markocupic\ContaoContentApi\DependencyInjection\MarkocupicContaoContentApiExtension;
+use Markocupic\ContaoApiBundle\DependencyInjection\Compiler\TaggedApiResourcePass;
+use Markocupic\ContaoApiBundle\DependencyInjection\MarkocupicContaoApiExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class MarkocupicContaoContentApi extends Bundle
+class MarkocupicContaoApiBundle extends Bundle
 {
     public function getPath(): string
     {
         return \dirname(__DIR__);
     }
 
-    public function getContainerExtension(): MarkocupicContaoContentApiExtension
+    public function getContainerExtension(): MarkocupicContaoApiExtension
     {
-        return new MarkocupicContaoContentApiExtension();
+        return new MarkocupicContaoApiExtension();
     }
 
     /**

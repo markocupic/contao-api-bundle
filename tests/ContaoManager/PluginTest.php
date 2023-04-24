@@ -7,23 +7,23 @@
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 declare(strict_types=1);
 
-namespace Markocupic\ContaoContentApi\Tests\ContaoManager;
+namespace Markocupic\ContaoApiBundle\Tests\ContaoManager;
 
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\DelegatingParser;
 use Contao\TestCase\ContaoTestCase;
-use Markocupic\ContaoContentApi\ContaoManager\Plugin;
-use Markocupic\ContaoContentApi\MarkocupicContaoContentApi;
+use Markocupic\ContaoApiBundle\ContaoManager\Plugin;
+use Markocupic\ContaoApiBundle\MarkocupicContaoApiBundle;
 
 /**
  * Class PluginTest
  *
- * @package Markocupic\ContaoContentApi\Tests\ContaoManager
+ * @package Markocupic\ContaoApiBundle\Tests\ContaoManager
  */
 class PluginTest extends ContaoTestCase
 {
@@ -47,7 +47,7 @@ class PluginTest extends ContaoTestCase
 
         $this->assertCount(1, $bundles);
         $this->assertInstanceOf(BundleConfig::class, $bundles[0]);
-        $this->assertSame(MarkocupicContaoContentApi::class, $bundles[0]->getName());
+        $this->assertSame(MarkocupicContaoApiBundle::class, $bundles[0]->getName());
         $this->assertSame([ContaoCoreBundle::class], $bundles[0]->getLoadAfter());
     }
 

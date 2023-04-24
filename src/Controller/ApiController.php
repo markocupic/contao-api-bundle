@@ -9,21 +9,21 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Controller;
+namespace Markocupic\ContaoApiBundle\Controller;
 
-use Markocupic\ContaoContentApi\Response\ContentApiResponse;
+use Markocupic\ContaoApiBundle\Response\ContentApiResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/_mc_cc_api', defaults: ['_scope' => 'frontend', '_token_check' => false])]
-class ContentApiController extends AbstractApiController
+#[Route('/_api', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+class ApiController extends AbstractApiController
 {
-    #[Route('/{apiKey}/content/{id}', name: 'markocupic_contao_content_api_content_show', methods: ['GET'])]
-    public function contentShowAction(string $apiKey, string $id, Request $request): Response
+    #[Route('/{apiKey}/{id}', name: 'markocupic_contao_api_show', methods: ['GET'])]
+    public function showAction(string $apiKey, string $id, Request $request): Response
     {
         // Initialize Contao framework
         $this->initialize();

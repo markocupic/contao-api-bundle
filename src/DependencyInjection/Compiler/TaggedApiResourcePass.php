@@ -9,12 +9,12 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\DependencyInjection\Compiler;
+namespace Markocupic\ContaoApiBundle\DependencyInjection\Compiler;
 
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
+use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -30,14 +30,14 @@ class TaggedApiResourcePass implements CompilerPassInterface
     {
         $definition = $container->findDefinition(ApiResourceManager::class);
 
-        $taggedServices = $container->findTaggedServiceIds('markocupic_contao_content_api.resource', true);
+        $taggedServices = $container->findTaggedServiceIds('markocupic_contao_api.resource', true);
 
         $mandatoryKeys = ['alias', 'type'];
 
         foreach ($taggedServices as $serviceId => $tags) {
             foreach ($mandatoryKeys as $key) {
                 if (!isset($tags[0][$key])) {
-                    throw new InvalidArgumentException(sprintf('Missing tag information "%s" on markocupic_contao_content_api.resource tagged service "%s".', $key, $serviceId));
+                    throw new InvalidArgumentException(sprintf('Missing tag information "%s" on markocupic_contao_api.resource tagged service "%s".', $key, $serviceId));
                 }
             }
 

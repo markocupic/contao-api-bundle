@@ -9,10 +9,10 @@ declare(strict_types=1);
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Api;
+namespace Markocupic\ContaoApiBundle\Api;
 
 use Contao\Controller;
 use Contao\CoreBundle\Framework\Adapter;
@@ -20,21 +20,21 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\ModuleModel;
 use Contao\StringUtil;
-use Markocupic\ContaoContentApi\Json\ContaoJson;
-use Markocupic\ContaoContentApi\Manager\ApiResourceManager;
-use Markocupic\ContaoContentApi\Model\ApiAppModel;
-use Markocupic\ContaoContentApi\Response\ResponseData\DefaultResponseData;
+use Markocupic\ContaoApiBundle\Json\ContaoJson;
+use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
+use Markocupic\ContaoApiBundle\Model\ApiAppModel;
+use Markocupic\ContaoApiBundle\Response\ResponseData\DefaultResponseData;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-#[AutoconfigureTag('markocupic_contao_content_api.resource', ['alias' => self::ALIAS, 'type' => self::TYPE, 'modelClass' => self::MODEL_CLASS, 'verboseName' => self::VERBOSE_NAME])]
+#[AutoconfigureTag('markocupic_contao_api.resource', ['alias' => self::ALIAS, 'type' => self::TYPE, 'modelClass' => self::MODEL_CLASS, 'verboseName' => self::VERBOSE_NAME])]
 class ApiContaoFrontendModule extends AbstractApi
 {
     public const ALIAS = 'contao_frontend_module';
     public const TYPE = 'contao_frontend_module';
     public const MODEL_CLASS = ModuleModel::class;
-    public const VERBOSE_NAME = 'Get the content of a Contao frontend module.';
+    public const VERBOSE_NAME = 'Get the html content of a Contao frontend module.';
 
     private string|null $strModuleClass = null;
 

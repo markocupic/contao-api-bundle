@@ -9,13 +9,13 @@ declare(strict_types=1);
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Exceptions;
+namespace Markocupic\ContaoApiBundle\Exceptions;
 
-use Markocupic\ContaoContentApi\ContaoJsonSerializable;
-use Markocupic\ContaoContentApi\Json\ContaoJson;
+use Markocupic\ContaoApiBundle\ContaoJsonSerializable;
+use Markocupic\ContaoApiBundle\Json\ContaoJson;
 
 /**
  * ContentApiNotFoundException is thrown whenever something is simply not there.
