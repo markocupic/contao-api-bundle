@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Contao Content Api.
+ * This file is part of Contao Api Bundle.
  *
  * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
@@ -18,7 +18,7 @@ use Contao\MemberModel;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('markocupic_contao_api.resource', ['alias' => self::ALIAS, 'type' => self::TYPE, 'modelClass' => self::MODEL_CLASS, 'verboseName' => self::VERBOSE_NAME])]
-class ApiMemberEntity extends AbstractApiEntityResource
+class ApiMemberEntity extends AbstractApiEntity
 {
     public const ALIAS = 'member';
     public const TYPE = 'contao_entity';

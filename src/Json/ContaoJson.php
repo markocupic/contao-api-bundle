@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Contao Content Api.
+ * This file is part of Contao Api Bundle.
  *
  * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
@@ -14,13 +14,12 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoApiBundle\Json;
 
-use Contao\Controller;
-use Contao\File;
-use Contao\FilesModel;
 use Contao\Model;
 use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\UserModel;
+use Contao\Validator;
 use Markocupic\ContaoApiBundle\Api\ApiInterface;
 
 /**
@@ -94,15 +93,16 @@ class ContaoJson implements \JsonSerializable
         if (\is_string($data)) {
             $data = $this->handleString($data);
         }
+
         $this->data = $data;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->data;
     }
 
-    private function handleCollection(Collection $collection)
+    private function handleCollection(Collection $collection): array
     {
         $data = [];
 
@@ -113,7 +113,7 @@ class ContaoJson implements \JsonSerializable
         return $data;
     }
 
-    private function handleArray(array $array)
+    private function handleArray(array $array): array
     {
         $data = [];
 
@@ -124,7 +124,7 @@ class ContaoJson implements \JsonSerializable
         return $data;
     }
 
-    private function handleObject(object $object)
+    private function handleObject(object $object): \stdClass
     {
         $data = new \stdClass();
 
@@ -134,23 +134,25 @@ class ContaoJson implements \JsonSerializable
                 continue;
             }
 
-            if ((false !== strpos($key, 'SRC') || 'pageImage' === $key) && $value) {
-                $src = $this->unserialize($value);
+            if ((str_contains($key, 'SRC') || 'pageImage' === $key) && $value) {
+                $src = $this->deserialize($value);
 
                 if (\is_array($src)) {
                     $files = [];
 
                     foreach ($src as $_val) {
-                        $files[] = (new File($_val, $object->size ?? null))->toJson();
+                        $files[] = Validator::isBinaryUuid($_val) ? StringUtil::binToUuid($_val) : $_val;
                     }
                     $data->{$key} = $files;
                 } else {
-                    $src = FilesModel::findByUuid($src)->path;
-                    //$data->{$key} = (new File($src, $object->size ?? null))->toJson();
+                    $data->{$key} = Validator::isBinaryUuid($src) ? StringUtil::binToUuid($src) : $src;
                 }
             } elseif ('author' === $key && is_numeric($value)) {
-                $author = System::getContainer()->get('markocupic_contao_api.resource.author');
-                $data->{$key} = $author->getFromId((int) $value)->toJson();
+                if (null !== ($_user = UserModel::findByPk($value))) {
+                    $data->{$key} = new self($_user->row());
+                } else {
+                    $data->{$key} = $value;
+                }
             } else {
                 $data->{$key} = new self($value);
             }
@@ -159,28 +161,33 @@ class ContaoJson implements \JsonSerializable
         return $data;
     }
 
-    private function handleNumber($number)
+    private function handleNumber($number): mixed
     {
         return $number ?? 0;
     }
 
-    private function handleString(string $string)
+    private function handleString(string $string): self|string
     {
+        if (Validator::isBinaryUuid($string)) {
+            $string = StringUtil::binToUuid($string);
+        }
+
         // Fix binary or otherwise "broken" strings
         $string = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
-        $unserialized = $this->unserialize($string);
+        $deserialized = $this->deserialize($string);
 
-        if (!\is_string($unserialized)) {
-            return new self($unserialized);
+        if (!\is_string($deserialized)) {
+            return new self($deserialized);
         }
-        $string = Controller::replaceInsertTags($string);
+
+        $string = System::getContainer()->get('contao.insert_tag.parser')->replaceInline($string);
         $string = trim($string);
         $string = preg_replace('/[[:blank:]]+/', ' ', $string);
 
         return StringUtil::decodeEntities($string, ENT_HTML5, 'UTF-8');
     }
 
-    private function isAssoc(array $arr)
+    private function isAssoc(array $arr): array|bool
     {
         if ([] === $arr) {
             return false;
@@ -189,16 +196,16 @@ class ContaoJson implements \JsonSerializable
         return array_keys($arr) !== range(0, \count($arr) - 1);
     }
 
-    private function unserialize(string $string)
+    private function deserialize(string $string): mixed
     {
-        $unserialized = @unserialize($string);
+        $deserialized = @unserialize($string);
 
-        if (false !== $unserialized) {
-            if ($this->isAssoc($unserialized)) {
-                return (object) $unserialized;
+        if (false !== $deserialized) {
+            if ($this->isAssoc($deserialized)) {
+                return (object) $deserialized;
             }
 
-            return $unserialized;
+            return $deserialized;
         }
 
         return $string;

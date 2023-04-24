@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Contao Content Api.
+ * This file is part of Contao Api Bundle.
  *
  * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
@@ -14,35 +14,27 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoApiBundle\Api;
 
-use Contao\Controller;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
-use Contao\StringUtil;
 use Markocupic\ContaoApiBundle\Json\ContaoJson;
 use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
 use Markocupic\ContaoApiBundle\Model\ApiAppModel;
 use Markocupic\ContaoApiBundle\Response\ResponseData\DefaultResponseData;
 use Markocupic\ContaoApiBundle\Util\ApiUtil;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
-abstract class AbstractApiEntityResource extends AbstractApi
+abstract class AbstractApiEntity extends AbstractApi
 {
     // Adapters
     private readonly Adapter $apiAppModel;
-    private readonly Adapter $stringUtil;
-    private readonly Adapter $controller;
 
     public function __construct(
         private readonly ContaoFramework $framework,
-        private readonly RequestStack $requestStack,
         private readonly ApiUtil $apiUtil,
         private readonly ApiResourceManager $apiResourceManager,
     ) {
         $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
-        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
-        $this->controller = $this->framework->getAdapter(Controller::class);
 
         $this->initializeResponseData(new DefaultResponseData());
     }
@@ -68,7 +60,8 @@ abstract class AbstractApiEntityResource extends AbstractApi
         $this->responseData->setRow(
             [
                 'id' => $id,
-                'type' => $resConfig['resourceType'],
+                'type' => $resConfig['type'],
+                'alias' => $resConfig['alias'],
                 'data' => $row->row(),
             ]
         );
@@ -92,7 +85,7 @@ abstract class AbstractApiEntityResource extends AbstractApi
             return $this->returnError(sprintf('Access to resource with ID %s denied.', $id));
         }
 
-        if (null === ($this->model = $resConfig['modelClass']::findByPk($id))) {
+        if (null === $resConfig['modelClass']::findByPk($id)) {
             return $this->returnError(sprintf('No entity found for ID %s.', $id));
         }
 
