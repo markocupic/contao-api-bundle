@@ -12,11 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoApiBundle\Model;
-
-use Contao\Model;
-
-class ApiAppModel extends Model
-{
-    protected static $strTable = 'tl_api_app';
-}
+/*
+ * Backend modules
+ */
+$GLOBALS['TL_LANG']['MOD']['api'] = 'API';
+$GLOBALS['TL_LANG']['MOD']['api_item'] = ['API item', 'API item'];

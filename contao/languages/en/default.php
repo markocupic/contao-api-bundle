@@ -11,12 +11,12 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-api-bundle
  */
+/*
+ * Miscelaneous
+ */
+//$GLOBALS['TL_LANG']['MSC'][''] = '';
 
-namespace Markocupic\ContaoApiBundle\Model;
-
-use Contao\Model;
-
-class ApiAppModel extends Model
-{
-    protected static $strTable = 'tl_api_app';
-}
+/*
+ * Errors
+ */
+//$GLOBALS['TL_LANG']['ERR'][''] = '';

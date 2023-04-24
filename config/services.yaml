@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+        bind:
+            $contaoApiEnabled: '%markocupic_contao_api.enabled%'
+
+    Markocupic\ContaoApiBundle\:
+        resource: ../src/
+        exclude: ../src/{DependencyInjection,Response,Model,Json}

@@ -5,83 +5,39 @@ declare(strict_types=1);
 /*
  * This file is part of Contao Content Api.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license GPL-3.0-or-later
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-content-api
+ * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoContentApi\Util;
+namespace Markocupic\ContaoApiBundle\Util;
 
-use Contao\CoreBundle\Framework\FrameworkAwareInterface;
-use Contao\CoreBundle\Framework\FrameworkAwareTrait;
-use Contao\System;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
+use Markocupic\ContaoApiBundle\Model\ApiAppModel;
 
-class ApiUtil implements FrameworkAwareInterface, ContainerAwareInterface
+class ApiUtil
 {
-    use ContainerAwareTrait;
-    use FrameworkAwareTrait;
+    private Adapter $apiAppModel;
 
-    public function getResourceConfigByName(string $resourceName): array|null
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ApiResourceManager $apiResourceManager,
+    ) {
+        $this->apiAppModel = $this->framework->getAdapter(ApiAppModel::class);
+    }
+
+    public function getApiResourceConfigurationFromApiKey(string $apiKey): array|null
     {
-        $resources = System::getContainer()->getParameter('markocupic_contao_content_api');
-
-        if (!isset($resources['resources'])) {
+        if (null === ($model = $this->apiAppModel->findOneByKey($apiKey))) {
             return null;
         }
 
-        foreach ($resources['resources'] as $resource) {
-            if ($resource['name'] === $resourceName) {
-                return $resource;
-            }
-        }
+        $services = $this->apiResourceManager->getServices();
 
-        return null;
+        return $services[$model->resourceAlias] ?? null;
     }
-
-    /*
-     * public function getResourceConfigByModelClass(string $modelClass)
-     * {
-     * $resources = System::getContainer()->getParameter('markocupic_contao_content_api');
-     *
-     * if (!isset($resources['api']['resources'])) {
-     * return false;
-     * }
-     *
-     * foreach ($resources['api']['resources'] as $resource) {
-     * if ($resource['modelClass'] === $modelClass) {
-     * return $resource;
-     * }
-     * }
-     *
-     * return false;
-     * }
-     *
-     * public function getResourceFieldOptions(string $resourceName)
-     * {
-     * $resourceConfig = $this->container->get('huh.api.util.api_util')->getResourceConfigByName($resourceName);
-     *
-     * if (!\is_array($resourceConfig) || !class_exists($resourceConfig['modelClass'])) {
-     * return [];
-     * }
-     *
-     * return $this->container->get('huh.utils.choice.field')->getCachedChoices([
-     * 'dataContainer' => $resourceConfig['modelClass']::getTable(),
-     * ]);
-     * }
-     *
-     * public function getEntityTableByApp(ApiAppModel $app)
-     * {
-     * $config = $this->getResourceConfigByName($app->resource);
-     *
-     * if (!isset($config['modelClass']) || !class_exists($config['modelClass'])) {
-     * return false;
-     * }
-     *
-     * return $config['modelClass']::getTable();
-     * }
-     */
 }

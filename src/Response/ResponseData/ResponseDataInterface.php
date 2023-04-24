@@ -12,11 +12,17 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-api-bundle
  */
 
-namespace Markocupic\ContaoApiBundle\Model;
+namespace Markocupic\ContaoApiBundle\Response\ResponseData;
 
-use Contao\Model;
-
-class ApiAppModel extends Model
+interface ResponseDataInterface
 {
-    protected static $strTable = 'tl_api_app';
+    public function set(string $key, mixed $value): void;
+
+    public function get(string $key): mixed;
+
+    public function getAll(): array;
+
+    public function setRow(array $data): void;
+
+    public function flush(): void;
 }
