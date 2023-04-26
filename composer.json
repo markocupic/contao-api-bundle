@@ -25,8 +25,7 @@
     },
     "config": {
         "allow-plugins": {
-            "contao-components/installer": false,
-            "contao/manager-plugin": false,
+            "contao/manager-plugin": true,
             "contao-community-alliance/composer-plugin": true
         }
     },
