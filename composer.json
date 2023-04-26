@@ -30,6 +30,13 @@
         "phpunit/phpunit": "^9.3",
         "symfony/phpunit-bridge": "5.4.*"
     },
+    "config": {
+       "allow-plugins": {
+           "contao/manager-plugin": false,
+           "contao-components/installer": false,
+           "dealerdirect/phpcodesniffer-composer-installer": true
+       }
+   },
     "autoload": {
         "psr-4": {
             "Markocupic\\ContaoApiBundle\\": "src/"
