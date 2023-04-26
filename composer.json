@@ -23,13 +23,12 @@
         "php": "^8.1",
         "contao/core-bundle": "^4.13"
     },
-    "require-dev": {
-        "contao/easy-coding-standard": "^5.0",
-        "contao/test-case": "^4.0",
-        "contao/manager-plugin": "^2.3",
-        "phpunit/phpunit": "^8.4",
-        "symfony/http-client": "4.4.*",
-        "symfony/phpunit-bridge": "4.4.*"
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": false,
+            "contao/manager-plugin": false,
+            "contao-community-alliance/composer-plugin": true
+        }
     },
     "autoload": {
         "psr-4": {
@@ -38,5 +37,10 @@
     },
     "extra": {
         "contao-manager-plugin": "Markocupic\\ContaoApiBundle\\ContaoManager\\Plugin"
+    },
+    "scripts": {
+        "cs-fixer": "@php tools/ecs/vendor/bin/ecs check config/ contao/ src/ tests/ --config tools/ecs/config.php --fix --ansi",
+        "phpstan": "@php tools/phpstan/vendor/bin/phpstan analyse src tests",
+        "unit-tests": "@php tools/phpunit/vendor/bin/phpunit -c tools/phpunit/phpunit.xml.dist"
     }
 }
