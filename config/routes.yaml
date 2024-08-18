@@ -1,3 +1,0 @@
-markocupic_contao_api.controller:
-    resource: ../src/Controller
-    type: attribute
