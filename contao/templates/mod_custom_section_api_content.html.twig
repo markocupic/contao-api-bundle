@@ -1,0 +1,48 @@
+{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js') %}
+<div id="apiContentElement" data-contao-ce="14306" v-html="html"></div>
+
+<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+    document.addEventListener("DOMContentLoaded", function (event) {
+
+        let vueElement = document.getElementById('apiContentElement');
+        let elId = vueElement.getAttribute('data-contao-ce');
+        let url = '/_api/09ac601ffa0bab8ed8522bf70e45b39a/' + elId + '?locale=de';
+
+        // Instantiate vue.js application
+        const {createApp} = Vue
+
+        // Instantiate vue.js application
+        const app = createApp({
+            el: vueElement,
+            data() {
+                return {
+                    elId: null,
+                    html: '',
+                };
+            },
+            mounted() {
+                let self = this;
+                self.fetchData();
+            },
+            methods: {
+                fetchData: function fetchData() {
+                    let self = this;
+
+                    fetch(url, {
+                        method: "GET",
+                        headers: {
+                            'x-requested-with': 'XMLHttpRequest'
+                        },
+                    }).then(function (res) {
+                        return res.json();
+                    }).then(function (json) {
+                        $(elId + ' .list-container').css('opacity', 0);
+                        self.html = json.compiledHTML;
+                    });
+                }
+            }
+        });
+
+        app.mount(elId);
+    });
+</script>
