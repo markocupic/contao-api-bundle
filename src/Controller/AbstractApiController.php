@@ -23,7 +23,7 @@ use Markocupic\ContaoApiBundle\Manager\ApiResourceManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 abstract class AbstractApiController extends AbstractController
 {
